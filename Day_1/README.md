@@ -1,21 +1,21 @@
-### Week 1 - Day 1:
+## Week 1 - Day 1:
 
-## Xem lại các kiến thức tổng quan về React
+### Xem lại các kiến thức tổng quan về React
 
 - Ôn tập lại React: components, props, useState, useEffect, event handling
 
-## Tìm hiểu NextJS, cài đặt môi trường và chạy dự án demo
+### Tìm hiểu NextJS, cài đặt môi trường và chạy dự án demo
 
 - Cài đặt NextJS app, chạy demo dự án, tìm hiểu cấu trúc thư mục cơ bản
 - Setup baseURL, paths
 
-## Tìm hiểu về Routing Fundamentals
+### Tìm hiểu về Routing Fundamentals
 
 - Hiểu và tạo được nested route cơ bản
 - Hiểu và tạo được nested layout cơ bản
 - Hiểu và tạo được dynamic segment cơ bản
 
-## Tìm hiểu Route Groups cơ bản
+### Tìm hiểu Route Groups cơ bản
 
 - Route Groups là quy ước đặt tên thư mục giúp tổ chức các route theo nhóm và không làm ảnh hưởng đến đường dẫn
 - Route Groups cho phép định nghĩa nhiều root layout cho từng thư mục
@@ -23,7 +23,7 @@
 - Trang sẽ reload nếu chuyển trang với các route có root layout khác nhau
 - Các route trong nhóm khác nhau không được trùng URL ((marketing)/about/page.js và (shop)/about/page.js)
 
-## Tìm hiểu về Linking, Navigating và Prefetch
+### Tìm hiểu về Linking, Navigating và Prefetch
 
 - Server Rendering: Static vs Dynamic
   - Static Rendering là render lúc build hoặc lúc revalidate và cache kết quả để dùng lại
