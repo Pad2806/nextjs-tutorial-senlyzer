@@ -43,3 +43,23 @@
 - Khác nhau giữa Loading UI và Suspense Fallback:
   - Loading UI sẽ tự wrap của route segment, nó sẽ loading toàn trang
   - Suspense fallback sẽ wrap cho 1 componet cụ thể, được dùng khi trong 1 trang có nhiều phần load độc lập
+
+### Tìm hiểu về Error handling
+
+- Error UI giúp bắt các lỗi runtimes không mong muốn và hiển thị giao diện dự phòng
+- Error UI thường bắt:
+  - Lỗi throw trong quá trình render / lifecycle phía client.
+  - Lỗi phát sinh trong quá trình render route segment (bao gồm lỗi từ Server Component)
+- Error Boundary trong React hiện tại phải chạy phía client để:
+  - Render fallback UI khi có lỗi,
+  - Cung cấp nút “Try again” gọi reset() để re-render segment.
+- Hàm error
+  - Là instance Error
+  - Dev: thường thấy message đầy đủ để debug
+  - Prod: lỗi từ Server Components sẽ có message “chung chung” để tránh leak; bạn dùng error.digest để đối chiếu log server
+- Hàm reset()
+  - Là “nút thử lại”
+  - Gọi reset() sẽ yêu cầu Next render lại route segment đó.
+  - Hữu ích khi lỗi là tạm thời (API timeout, mạng chập chờn, cache lỗi…).
+- Ta có thể bắt lỗi ở root layout hoặc một trang lỗi chung cho toàn app với global-error.tsx
+- Nhưng global-error.tsx phải tự khai báo <html><body>.

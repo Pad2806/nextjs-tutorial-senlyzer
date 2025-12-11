@@ -10,9 +10,7 @@ export default function RootLayout({
       <body>
         <nav>
           {/* Prefetched when the link is hovered or enters the viewport */}
-          <Link href="/">Home</Link>
-          <br />
-          <Counter />
+          <Link href="/docs">Báo cáo</Link>
         </nav>
         {children}
       </body>

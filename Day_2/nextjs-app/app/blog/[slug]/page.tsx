@@ -1,15 +1,7 @@
-// export default async function Page({
-//   params,
-// }: {
-//   params: Promise<{ slug: string }>;
-// }) {
-//   const { slug } = await params;
-//   return <div>My Post: {slug}</div>;
-// }
 "use client";
 import { use } from "react";
 
-export default function BlogPostPage({
+export default function BlogPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -18,7 +10,7 @@ export default function BlogPostPage({
 
   return (
     <div>
-      <p>{slug}</p>
+      <p>slug array: {JSON.stringify({ slug })}</p>
     </div>
   );
 }
