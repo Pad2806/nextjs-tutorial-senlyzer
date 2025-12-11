@@ -63,3 +63,5 @@
   - Hữu ích khi lỗi là tạm thời (API timeout, mạng chập chờn, cache lỗi…).
 - Ta có thể bắt lỗi ở root layout hoặc một trang lỗi chung cho toàn app với global-error.tsx
 - Nhưng global-error.tsx phải tự khai báo <html><body>.
+
+### Link Demo
