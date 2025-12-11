@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -9,8 +11,10 @@ export default async function CustomersPage({
 }) {
   const { slug } = await params;
 
-  await sleep(1500); // giả lập chậm
-
+  await sleep(1500);
+  if (!slug || slug.length === 0) {
+    notFound();
+  }
   const normalized = slug ?? [];
   return (
     <div>
