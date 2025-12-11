@@ -71,9 +71,22 @@ export default function DocsPage() {
           </li>
         </ul>
       </section>
-
       <section style={{ marginBottom: 32 }}>
-        <h2>5. Suspense Rendering</h2>
+        <h2>5. Loading UI</h2>
+        <p>
+          Demo:
+          <Link href="/feed">/feed</Link>
+        </p>
+      </section>
+      <section style={{ marginBottom: 32 }}>
+        <h2>6. NotFound UI</h2>
+        <p>
+          Demo:
+          <Link href="/customers">/customers</Link>
+        </p>
+      </section>
+      <section style={{ marginBottom: 32 }}>
+        <h2>7. Suspense Rendering</h2>
         <p>
           Sử dụng <code>&lt;Suspense&gt;</code> để render song song Feed &
           Weather, mỗi phần có fallback riêng.
