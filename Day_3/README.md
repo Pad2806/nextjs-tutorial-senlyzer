@@ -49,3 +49,20 @@
 - Preloading data: khởi chạy request trước khi render component, kết hợp cache() để tái sử dụng.
 
 ### Tìm hiểu về Static and Dynamic Rendering
+
+Static Rendering
+
+- Dữ liệu sẽ được fetch và render trên server khi build hoặc khi revalidate data và lưu cache
+- Khi người dùng vào trang, cache sẽ trả kết quả ra giao diện
+- Giúp trang tải nhanh, hiệu năng cao
+- Giảm tải server, vì nội dung đã được cache nên server kh cần render lại mỗi khi có request
+- Giúp tăng SEO
+- Không phù hợp với các trang quản lý cần cập nhật thường xuyên
+  Dynamic Rendering
+- Nội dung sẽ được render lại trên server với mỗi request
+- Cho phép ứng dụng hiển thị dữ liệu cập nhật thường xuyên hoặc theo thời gian thực
+- Phù hợp với các nội dung cá nhân như trang người dùng hoặc quản lý có thể cập nhật dữ liệu dựa trên tương tác người dùng
+- Cho phép truy cập thông tin chỉ có thể được biết tại thời điểm yêu cầu, chẳng hạn như cookie hoặc tham số tìm kiếm URL
+- Với dynamic rendering, ứng dụng chỉ có thể nhanh bằng dữ liệu được trả chậm nhất
+
+### Deploy
