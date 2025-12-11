@@ -71,7 +71,13 @@ export default function DocsPage() {
           </li>
         </ul>
       </section>
-
+      <section style={{ marginBottom: 32 }}>
+        <h2>4. Loading UI</h2>
+        <p>
+          Demo:
+          <Link href="/feed">/feed</Link>
+        </p>
+      </section>
       <section style={{ marginBottom: 32 }}>
         <h2>5. Suspense Rendering</h2>
         <p>
