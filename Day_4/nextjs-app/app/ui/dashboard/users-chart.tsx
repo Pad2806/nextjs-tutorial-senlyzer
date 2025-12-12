@@ -26,13 +26,22 @@ export default async function UserChart() {
                 )}
               >
                 <div className="flex items-center">
-                  <Image
+                  {/* <Image
                     src={user.image_url}
                     alt={`${user.name}'s profile picture`}
                     className="mr-4 rounded-full"
                     width={32}
                     height={32}
-                  />
+                  /> */}
+                  {user.image_url && (
+                    <Image
+                      src={user.image_url}
+                      alt={`${user.name}'s profile picture`}
+                      className="mr-4 rounded-full"
+                      width={32}
+                      height={32}
+                    />
+                  )}
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold md:text-base">
                       {user.name}
