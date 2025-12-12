@@ -66,3 +66,5 @@ Static Rendering
 - Với dynamic rendering, ứng dụng chỉ có thể nhanh bằng dữ liệu được trả chậm nhất
 
 ### Deploy
+
+https://nextjs-tutorial-senlyzer-fihb.vercel.app/
