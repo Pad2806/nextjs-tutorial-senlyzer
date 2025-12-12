@@ -8,8 +8,8 @@ import clsx from "clsx";
 const links = [
   { name: "Home", href: "/dashboard", icon: HomeIcon },
   {
-    name: "Blogs",
-    href: "/dashboard/blogs",
+    name: "Users",
+    href: "/dashboard/users",
     icon: DocumentDuplicateIcon,
   },
 ];
