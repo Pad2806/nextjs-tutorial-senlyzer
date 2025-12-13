@@ -63,12 +63,12 @@ export async function createUser(formData: FormData) {
 }
 
 export async function updateUser(id: string, formData: FormData) {
-  const { name, email, password, image_url, status } = UpdateInvoice.parse({
+  const { name, email, password, status } = UpdateInvoice.parse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password") || null,
-    image_url: formData.get("image_url") || null,
     status: formData.get("status"),
+    image_url: null,
   });
 
   let hashedPassword: string | null = null;
@@ -76,7 +76,23 @@ export async function updateUser(id: string, formData: FormData) {
   if (password !== null) {
     hashedPassword = await bcrypt.hash(password, 10);
   }
+  let image_url: string | null = null;
+  const file = formData.get("image") as File | null;
 
+  if (file && file.size > 0) {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Invalid image file");
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploadDir = path.join(process.cwd(), "public/uploads");
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    const fileName = `${crypto.randomUUID()}-${file.name}`;
+    await fs.writeFile(path.join(uploadDir, fileName), buffer);
+
+    image_url = `/uploads/${fileName}`;
+  }
   await sql`
     UPDATE users
     SET
