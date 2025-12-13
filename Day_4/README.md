@@ -60,3 +60,4 @@
 - not-found.tsx giúp hiển thị UI cho lỗi 404, có thể đặt theo route segment
 
 ### Deploy
+https://nextjs-tutorial-senlyzer-phi.vercel.app/
