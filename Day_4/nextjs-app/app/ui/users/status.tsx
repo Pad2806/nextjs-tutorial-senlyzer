@@ -20,7 +20,7 @@ export default function UserStatus({ status }: { status: string }) {
       ) : null}
       {status === "active" ? (
         <>
-          Paid
+          Active
           <CheckIcon className="ml-1 w-4 text-white" />
         </>
       ) : null}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { updateUser } from "@/app/lib/actions";
 import { User } from "@/app/lib/definition";
 import Image from "next/image";
@@ -18,6 +19,9 @@ const inputBase =
   "peer w-full rounded-md border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 export default function EditUserForm({ user }: { user: User }) {
+  const [fileName, setFileName] = useState<string>("No file chosen");
+  const [status, setStatus] = useState<"pending" | "active">(user.status);
+
   const updateUserWithId = updateUser.bind(null, user.id);
 
   return (
@@ -83,27 +87,39 @@ export default function EditUserForm({ user }: { user: User }) {
           </label>
 
           <div className="flex items-center gap-4">
-            {user.image_url && (
-              <Image
-                src={user.image_url}
-                alt="User avatar"
-                width={80}
-                height={80}
-                className="rounded-md border"
-              />
-            )}
+            {/* Current avatar */}
+            <Image
+              src={user.image_url ?? "/images/default-avatar.png"}
+              alt="User avatar"
+              width={80}
+              height={80}
+              className="rounded-md border"
+            />
 
-            <label className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
+            {/* File upload */}
+            <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-md border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
               <PhotoIcon className="h-5 w-5 text-gray-400" />
-              <span>Change avatar (URL)</span>
+
+              <span className="font-medium">Choose file</span>
+
+              <span className="truncate text-gray-500">{fileName}</span>
+
               <input
-                type="text"
-                name="image_url"
-                defaultValue={user.image_url ?? ""}
+                type="file"
+                name="image"
+                accept="image/*"
                 className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setFileName(file ? file.name : "No file chosen");
+                }}
               />
             </label>
           </div>
+
+          <p className="mt-1 text-xs text-gray-500">
+            Leave empty to keep current avatar.
+          </p>
         </div>
 
         {/* Status */}
@@ -113,27 +129,45 @@ export default function EditUserForm({ user }: { user: User }) {
           </label>
 
           <div className="flex gap-4">
-            <label className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm hover:border-blue-500">
+            {/* Pending */}
+            <label
+              className={`cursor-pointer rounded-full border px-4 py-2 text-sm flex items-center gap-2
+        ${
+          status === "pending"
+            ? "border-blue-600 bg-blue-50 text-blue-700"
+            : "border-gray-300 hover:border-blue-400"
+        }`}
+            >
               <input
                 type="radio"
                 name="status"
                 value="pending"
-                defaultChecked={user.status === "pending"}
-                className="hidden"
+                checked={status === "pending"}
+                onChange={() => setStatus("pending")}
+                className="sr-only"
               />
-              <ClockIcon className="h-4 w-4 text-gray-500" />
+              <ClockIcon className="h-4 w-4" />
               Pending
             </label>
 
-            <label className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm hover:border-green-500">
+            {/* Active */}
+            <label
+              className={`cursor-pointer rounded-full border px-4 py-2 text-sm flex items-center gap-2
+        ${
+          status === "active"
+            ? "border-green-600 bg-green-50 text-green-700"
+            : "border-gray-300 hover:border-green-400"
+        }`}
+            >
               <input
                 type="radio"
                 name="status"
                 value="active"
-                defaultChecked={user.status === "active"}
-                className="hidden"
+                checked={status === "active"}
+                onChange={() => setStatus("active")}
+                className="sr-only"
               />
-              <CheckIcon className="h-4 w-4 text-green-500" />
+              <CheckIcon className="h-4 w-4" />
               Active
             </label>
           </div>
