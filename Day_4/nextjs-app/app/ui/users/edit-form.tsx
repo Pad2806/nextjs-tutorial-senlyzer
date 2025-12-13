@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { updateUser } from "@/app/lib/actions";
 import { User } from "@/app/lib/definition";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/app/ui/button";
 import {
@@ -12,14 +11,12 @@ import {
   LockClosedIcon,
   ClockIcon,
   CheckIcon,
-  PhotoIcon,
 } from "@heroicons/react/24/outline";
 
 const inputBase =
   "peer w-full rounded-md border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 export default function EditUserForm({ user }: { user: User }) {
-  const [fileName, setFileName] = useState<string>("No file chosen");
   const [status, setStatus] = useState<"pending" | "active">(user.status);
 
   const updateUserWithId = updateUser.bind(null, user.id);
@@ -78,48 +75,6 @@ export default function EditUserForm({ user }: { user: User }) {
             />
             <LockClosedIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
           </div>
-        </div>
-
-        {/* Avatar */}
-        <div className="mb-6">
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Avatar
-          </label>
-
-          <div className="flex items-center gap-4">
-            {/* Current avatar */}
-            <Image
-              src={user.image_url ?? "/images/default-avatar.png"}
-              alt="User avatar"
-              width={80}
-              height={80}
-              className="rounded-md border"
-            />
-
-            {/* File upload */}
-            <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-md border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
-              <PhotoIcon className="h-5 w-5 text-gray-400" />
-
-              <span className="font-medium">Choose file</span>
-
-              <span className="truncate text-gray-500">{fileName}</span>
-
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  setFileName(file ? file.name : "No file chosen");
-                }}
-              />
-            </label>
-          </div>
-
-          <p className="mt-1 text-xs text-gray-500">
-            Leave empty to keep current avatar.
-          </p>
         </div>
 
         {/* Status */}

@@ -1,9 +1,7 @@
-import Image from "next/image";
 import { UpdateUser, DeleteUser } from "@/app/ui/users/buttons";
 import UserStatus from "@/app/ui/users/status";
 import { formatDateToLocal } from "@/app/lib/utils";
-import { fetchFilteredUsers, fetchUser } from "@/app/lib/data";
-import Link from "next/link";
+import { fetchFilteredUsers } from "@/app/lib/data";
 
 export default async function UsersTable({
   query,
@@ -27,22 +25,6 @@ export default async function UsersTable({
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center">
-                      {/* <Image
-                        src={user.image_url}
-                        className="mr-2 rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${user.name}'s profile picture`}
-                      /> */}
-                      {user.image_url && (
-                        <Image
-                          src={user.image_url}
-                          alt={`${user.name}'s profile picture`}
-                          className="mr-4 rounded-full"
-                          width={28}
-                          height={28}
-                        />
-                      )}
                       <p>{user.name}</p>
                     </div>
                     <p className="text-sm text-gray-500">{user.email}</p>
@@ -89,22 +71,6 @@ export default async function UsersTable({
                 >
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
-                      {/* <Image
-                        src={user.image_url}
-                        className="rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${user.name}'s profile picture`}
-                      /> */}
-                      {user.image_url && (
-                        <Image
-                          src={user.image_url}
-                          alt={`${user.name}'s profile picture`}
-                          className="mr-4 rounded-full"
-                          width={28}
-                          height={28}
-                        />
-                      )}
                       <p>{user.name}</p>
                     </div>
                   </td>

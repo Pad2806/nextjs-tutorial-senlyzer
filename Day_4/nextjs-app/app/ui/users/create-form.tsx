@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+
 import Link from "next/link";
 import {
   UserCircleIcon,
@@ -7,7 +7,6 @@ import {
   ClockIcon,
   CheckIcon,
   LockClosedIcon,
-  PhotoIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/app/ui/button";
 import { createUser } from "@/app/lib/actions";
@@ -16,7 +15,6 @@ const inputBase =
   "peer w-full rounded-md border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 export default function CreateUserForm() {
-  const [fileName, setFileName] = useState<string>("No file chosen");
   return (
     <form action={createUser} className="max-w-3xl mx-auto">
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -63,31 +61,6 @@ export default function CreateUserForm() {
           </div>
         </div>
 
-        {/* Avatar */}
-        <div className="mb-6">
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Avatar
-          </label>
-
-          <div className="flex items-center gap-3">
-            <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-md border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
-              <PhotoIcon className="h-5 w-5 text-gray-400" />
-              <span className="font-medium">Choose file</span>
-              <span className="truncate text-gray-500">{fileName}</span>
-
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  setFileName(f ? f.name : "No file chosen");
-                }}
-              />
-            </label>
-          </div>
-        </div>
         {/* Status */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">

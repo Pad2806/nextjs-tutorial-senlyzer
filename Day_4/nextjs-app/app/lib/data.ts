@@ -6,7 +6,7 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 export async function fetchUser() {
   try {
     const data = await sql<UserField[]>`
-      SELECT users.name, users.image_url, users.email, users.status
+      SELECT users.name, users.email, users.status
       FROM users
       ORDER BY name DESC
       LIMIT 5`;
@@ -61,8 +61,7 @@ export async function fetchFilteredUsers(query: string, currentPage: number) {
         users.date,
         users.status,
         users.name,
-        users.email,
-        users.image_url
+        users.email
       FROM users
       WHERE
         users.name ILIKE ${`%${query}%`} OR
@@ -106,8 +105,7 @@ export async function fetchUserById(id: string) {
         users.date,
         users.status,
         users.name,
-        users.email,
-        users.image_url
+        users.email
       FROM users
       WHERE users.id = ${id};
     `;

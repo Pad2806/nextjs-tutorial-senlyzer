@@ -1,6 +1,5 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import Image from "next/image";
 import { lusitana } from "@/app/ui/fonts";
 import { fetchUser } from "@/app/lib/data";
 export default async function UserChart() {
@@ -17,7 +16,9 @@ export default async function UserChart() {
           {users.map((user, i) => {
             return (
               <div
-                key={user.id}
+                // key={user.id}
+
+                key={`${user.id ?? "user"}-${i}`}
                 className={clsx(
                   "flex flex-row items-center justify-between py-4",
                   {
@@ -26,22 +27,6 @@ export default async function UserChart() {
                 )}
               >
                 <div className="flex items-center">
-                  {/* <Image
-                    src={user.image_url}
-                    alt={`${user.name}'s profile picture`}
-                    className="mr-4 rounded-full"
-                    width={32}
-                    height={32}
-                  /> */}
-                  {user.image_url && (
-                    <Image
-                      src={user.image_url}
-                      alt={`${user.name}'s profile picture`}
-                      className="mr-4 rounded-full"
-                      width={32}
-                      height={32}
-                    />
-                  )}
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold md:text-base">
                       {user.name}
