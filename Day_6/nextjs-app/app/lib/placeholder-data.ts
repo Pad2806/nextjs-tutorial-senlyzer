@@ -1,0 +1,51 @@
+const users = [
+  {
+    id: "d6e15727-9fe1-4961-8c5b-ea44a9bd81aa",
+    name: "Evil Rabbit",
+    email: "evil@rabbit.com",
+    password: "123456",
+    status: "pending",
+    date: "2025-12-06",
+  },
+  {
+    id: "3958dc9e-712f-4377-85e9-fec4b6a6442a",
+    name: "Delba de Oliveira",
+    email: "delba@oliveira.com",
+    password: "123456",
+    status: "pending",
+    date: "2025-12-08",
+  },
+  {
+    id: "3958dc9e-742f-4377-85e9-fec4b6a6442a",
+    name: "Lee Robinson",
+    email: "lee@robinson.com",
+    password: "123456",
+    status: "active",
+    date: "2025-12-11",
+  },
+  {
+    id: "76d65c26-f784-44a2-ac19-586678f7c2f2",
+    name: "Michael Novotny",
+    email: "michael@novotny.com",
+    password: "123456",
+    status: "active",
+    date: "2025-12-12",
+  },
+  {
+    id: "CC27C14A-0ACF-4F4A-A6C9-D45682C144B9",
+    name: "Amy Burns",
+    email: "amy@burns.com",
+    password: "123456",
+    status: "active",
+    date: "2025-12-10",
+  },
+  {
+    id: "13D07535-C59E-4157-A011-F8D2EF4E0CBB",
+    name: "Balazs Orban",
+    email: "balazs@orban.com",
+    password: "123456",
+    status: "active",
+    date: "2025-12-09",
+  },
+];
+export { users };
