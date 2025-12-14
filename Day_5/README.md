@@ -70,3 +70,5 @@
   - Indexing là bước lưu trữ dữ liệu đã thu thập theo cách có tổ chức để có thể truy vấn nhanh khi người dùng tìm kiếm
   - Rendering là quá trình thực thi tài nguyên của trang (đặc biệt là JavaScript) để tạo ra phiên bản nội dung hoàn chỉnh như người dùng nhìn thấy trên trình duyệt.
   - Ranking là bước truy vấn dữ liệu trong index và tạo ra trang kết quả tìm kiếm phù hợp dựa trên input của người dùng
+### Deploy
+https://nextjs-tutorial-senlyzer-day5.vercel.app/
