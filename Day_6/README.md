@@ -108,3 +108,5 @@
 - Có thể tiếp cận với Core Web Vitals với 2 cách:
   - Cố gắng để đạt được điểm số cao nhất có thể trong mỗi chỉ số, cách này rất tốt về mặt kỹ thuật nhưng khó đạt tuyệt đối với các website lớn
   - Benchmark so với đối thủ trong ngành, thay vì cạnh tranh với các website được tối ứu hoá hoàn hảo trong tìm kiếm của Google mà chỉ cần cạnh tranh với các trang web đang xếp hạng cùng keyword mục tiêu
+### Deploy 
+https://nextjs-tutorial-senlyzer-delta.vercel.app/
