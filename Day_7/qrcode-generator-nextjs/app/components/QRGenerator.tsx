@@ -25,7 +25,9 @@ export default function QrGenerator() {
   )}&color=${encodeURIComponent(color)}&bg=${encodeURIComponent(bg)}`;
 
   const qrUrl = origin
-    ? `${origin}/img?content=${encodeURIComponent(text)}`
+    ? `${origin}/img?content=${encodeURIComponent(
+        text
+      )}&color=${encodeURIComponent(color)}&bg=${encodeURIComponent(bg)}`
     : "";
 
   async function handleCopy() {

@@ -27,9 +27,15 @@ export default async function ImgPage({
     );
   }
 
-  const apiUrl = `/api/qr?content=${params.content}&color=${
-    params.color ?? "#000000"
-  }&bg=${params.bg ?? "#ffffff"}`;
+  const content = params.content ? decodeURIComponent(params.content) : "";
+
+  const color = params.color ? decodeURIComponent(params.color) : "#000000";
+
+  const bg = params.bg ? decodeURIComponent(params.bg) : "#ffffff";
+
+  const apiUrl = `/api/qr?content=${encodeURIComponent(
+    content
+  )}&color=${encodeURIComponent(color)}&bg=${encodeURIComponent(bg)}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-6">
@@ -47,7 +53,8 @@ export default async function ImgPage({
           <img
             src={apiUrl}
             alt="QR Code"
-            className="w-64 h-64 object-contain mix-blend-multiply"
+            className="w-64 h-64 object-contain"
+            style={{ imageRendering: "pixelated" }}
           />
         </div>
 
