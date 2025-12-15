@@ -1,13 +1,11 @@
-import { redirect } from "next/navigation";
-
 export default function ImgPage({
   searchParams,
 }: {
   searchParams: { content?: string };
 }) {
-  if (!searchParams.content) {
-    redirect("/");
-  }
+  const target = searchParams.content
+    ? decodeURIComponent(searchParams.content)
+    : "/";
 
-  redirect(decodeURIComponent(searchParams.content));
+  return Response.redirect(target, 302);
 }
