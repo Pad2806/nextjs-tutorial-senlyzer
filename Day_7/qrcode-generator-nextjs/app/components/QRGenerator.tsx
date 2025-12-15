@@ -9,9 +9,10 @@ export default function QrGenerator() {
 
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const qrUrl = `${
-    process.env.NEXT_PUBLIC_BASE_URL
-  }/img?content=${encodeURIComponent(text)}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+  const qrUrl = `${origin}/img?content=${encodeURIComponent(text)}`;
+
   const apiUrl = `/api/qr?content=${encodeURIComponent(
     text
   )}&color=${encodeURIComponent(color)}&bg=${encodeURIComponent(bg)}`;
