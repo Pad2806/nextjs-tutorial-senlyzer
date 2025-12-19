@@ -1,11 +1,12 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { generateSepayQR } from "@/app/lib/payment/vietqr";
+import { generateSepayQR } from "@/app/lib/payment/sepayqr";
 import { useState } from "react";
 
 export default function PaymentPage() {
   const params = useSearchParams();
   const name = params.get("name") || "Khách hàng";
+  const service = params.get("service") || "-";
   const phone = params.get("phone") || "";
   const amount = Number(params.get("amount")) || 150000;
   const [copied, setCopied] = useState(false);
@@ -32,20 +33,6 @@ export default function PaymentPage() {
     URL.revokeObjectURL(url);
   };
 
-  // const handleCopyQR = async () => {
-  //   try {
-  //     const res = await fetch(qrUrl);
-  //     const blob = await res.blob();
-  //     const item = new ClipboardItem({
-  //       "image/png": blob,
-  //       "text/plain": new Blob([qrUrl], { type: "text/plain" }),
-  //     });
-  //     await navigator.clipboard.write([item]);
-  //     alert("Đã copy QR");
-  //   } catch {
-  //     alert("Copy thất bại");
-  //   }
-  // };
   const handleCopyQR = async () => {
     try {
       const res = await fetch(qrUrl);
@@ -66,7 +53,7 @@ export default function PaymentPage() {
   };
 
   return (
-    <main className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 bg-slate-50">
+    <main className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 bg-slate-50 py-5">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-lg shadow-blue-100 p-8 space-y-8 text-center">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">
@@ -80,6 +67,9 @@ export default function PaymentPage() {
         <div className="bg-blue-50 rounded-xl p-4 text-sm text-left space-y-1">
           <p>
             <span className="text-slate-500">Khách hàng:</span> <b>{name}</b>
+          </p>
+          <p>
+            <span className="text-slate-500">Dịch vụ:</span> <b>{service}</b>
           </p>
           <p>
             <span className="text-slate-500">Số tiền:</span>{" "}
@@ -137,6 +127,24 @@ export default function PaymentPage() {
         <p className="text-xs text-slate-400">
           Hệ thống sẽ tự động xác nhận sau 1–3 phút
         </p>
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <button
+            onClick={() => {
+              window.location.href = `/result?status=paid&name=${name}`;
+            }}
+            className="rounded-xl bg-green-600 text-white py-3 text-sm font-medium hover:bg-green-700"
+          >
+            Đã thanh toán
+          </button>
+          <button
+            onClick={() => {
+              window.location.href = `/result?status=unpaid&name=${name}`;
+            }}
+            className="rounded-xl bg-slate-200 text-slate-700 py-3 text-sm font-medium hover:bg-slate-300"
+          >
+            Chưa thanh toán
+          </button>
+        </div>
       </div>
     </main>
   );

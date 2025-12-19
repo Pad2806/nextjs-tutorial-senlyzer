@@ -22,35 +22,44 @@ export function useBookingForm() {
     clinic: '',
   });
 
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Partial<BookingFormState>>({});
 
   function update<K extends keyof BookingFormState>(
     key: K,
     value: BookingFormState[K]
   ) {
     setForm(prev => ({ ...prev, [key]: value }));
-    setError(null);
-  }
-
-  function validate() {
-    if (!form.name.trim()) return 'Vui lòng nhập họ tên';
-    if (!form.phone.trim()) return 'Vui lòng nhập số điện thoại';
-    if (!/^[0-9]{9,11}$/.test(form.phone))
-      return 'Số điện thoại không hợp lệ';
-    if (
-      form.email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
-    )
-      return 'Email không hợp lệ';
-    return null;
+    setErrors(prev => ({
+      ...prev,
+      [key]: undefined,
+    }));
   }
 
   function submit() {
-    const err = validate();
-    if (err) {
-      setError(err);
+    const newErrors: Partial<BookingFormState> = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = 'Vui lòng nhập họ và tên';
+    }
+
+    if (!form.phone.trim()) {
+      newErrors.phone = 'Vui lòng nhập số điện thoại';
+    } else if (!/^\d{9,11}$/.test(form.phone)) {
+      newErrors.phone = 'Số điện thoại không hợp lệ';
+    }
+
+    if(!form.email.trim()){
+      newErrors.email = 'Vui lòng nhập email';
+    }else if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+
+    setErrors({});
 
     const params = new URLSearchParams({
       ...form,
@@ -60,5 +69,5 @@ export function useBookingForm() {
     router.push(`/payment?${params.toString()}`);
   }
 
-  return { form, update, submit, error };
+  return { update, submit, errors };
 }
