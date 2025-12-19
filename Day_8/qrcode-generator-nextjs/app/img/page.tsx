@@ -1,3 +1,84 @@
+// import Link from "next/link";
+
+// export default async function ImgPage({
+//   searchParams,
+// }: {
+//   searchParams: Promise<{ content?: string; color?: string; bg?: string }>;
+// }) {
+//   const params = await searchParams;
+
+//   const content = params.content ? decodeURIComponent(params.content) : "";
+//   const color = params.color ? decodeURIComponent(params.color) : "#000000";
+//   const bg = params.bg ? decodeURIComponent(params.bg) : "#ffffff";
+
+//   const apiUrl = `/api/qr?content=${encodeURIComponent(
+//     content
+//   )}&color=${encodeURIComponent(color)}&bg=${encodeURIComponent(bg)}`;
+
+//   if (!params.content) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 p-6 font-sans">
+//         <div className="text-center max-w-md">
+//           <div className="w-16 h-16 bg-zinc-200 rounded-full flex items-center justify-center mx-auto mb-4">
+//             <span className="text-2xl">?</span>
+//           </div>
+//           <h2 className="text-lg font-bold text-zinc-900 mb-2">
+//             Liên kết không hợp lệ
+//           </h2>
+//           <p className="text-zinc-500 mb-6 text-sm">
+//             Chúng tôi không tìm thấy dữ liệu để tạo mã QR.
+//           </p>
+//           <Link
+//             href="/"
+//             className="text-sm font-medium text-zinc-900 underline hover:text-zinc-600"
+//           >
+//             Quay về trang chủ
+//           </Link>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-zinc-100 p-6 font-sans">
+//       <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-xl shadow-zinc-200/50 max-w-sm w-full text-center border border-zinc-100">
+//         <div className="mb-8">
+//           <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
+//             QR Code
+//           </h2>
+//           <p className="text-xs text-zinc-400 mt-1 uppercase tracking-widest">
+//             Scan to view
+//           </p>
+//         </div>
+
+//         <div className="relative inline-block group">
+//           {/* Decorative corner markers */}
+//           <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-zinc-900"></div>
+//           <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-zinc-900"></div>
+//           <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-zinc-900"></div>
+//           <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-zinc-900"></div>
+
+//           <img
+//             src={apiUrl}
+//             alt="QR Code"
+//             className="w-64 h-64 object-contain"
+//             style={{ imageRendering: "pixelated" }}
+//           />
+//         </div>
+
+//         <div className="mt-10 pt-6 border-t border-zinc-100">
+//           <Link
+//             href="/"
+//             className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-zinc-400 hover:text-zinc-900 transition-colors"
+//           >
+//             <span>Powered by PAD</span>
+//           </Link>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 import Link from "next/link";
 
 export default async function ImgPage({
@@ -52,7 +133,7 @@ export default async function ImgPage({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-6 font-sans relative overflow-hidden">
-
+      {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-[128px]"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-[128px]"></div>
@@ -80,6 +161,7 @@ export default async function ImgPage({
                 className="w-56 h-56 object-contain rounded-lg"
                 style={{ imageRendering: "pixelated" }}
               />
+              {/* Decor elements */}
               <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-slate-900 rounded-tl-sm"></div>
               <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-slate-900 rounded-tr-sm"></div>
               <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-slate-900 rounded-bl-sm"></div>
