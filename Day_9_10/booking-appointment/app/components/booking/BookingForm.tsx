@@ -1,8 +1,21 @@
 "use client";
 import { useBookingForm } from "./useBookingForm";
+import { useEffect, useState } from "react";
 
 export default function BookingForm() {
   const { update, submit, errors } = useBookingForm();
+  const [services, setServices] = useState<{ id: string; name: string }[]>([]);
+
+  const [clinics, setClinics] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    fetch("/api/services")
+      .then((res) => res.json())
+      .then(setServices);
+
+    fetch("/api/clinics")
+      .then((res) => res.json())
+      .then(setClinics);
+  }, []);
 
   return (
     <div className="max-w-md w-full bg-white rounded-3xl shadow-lg shadow-blue-100 p-8 space-y-8">
@@ -61,19 +74,24 @@ export default function BookingForm() {
             className="form-input"
             onChange={(e) => update("service", e.target.value)}
           >
-            <option value="">Dịch vụ</option>
-            <option>Khám tổng quát</option>
-            <option>Da liễu</option>
-            <option>Nội khoa</option>
+            <option value="">Chọn dịch vụ</option>
+            {services.map((service) => (
+              <option key={service.id} value={service.id}>
+                {service.name}
+              </option>
+            ))}
           </select>
 
           <select
             className="form-input"
             onChange={(e) => update("clinic", e.target.value)}
           >
-            <option value="">Phòng khám</option>
-            <option>Tại 123 Hàm Nghi</option>
-            <option>Tại 345 Nguyễn Văn Linh</option>
+            <option value="">Chọn phòng khám</option>
+            {clinics.map((clinic) => (
+              <option key={clinic.id} value={clinic.id}>
+                {clinic.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
