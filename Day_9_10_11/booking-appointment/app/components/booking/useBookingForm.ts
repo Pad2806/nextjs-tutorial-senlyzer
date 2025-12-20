@@ -33,36 +33,51 @@ export function useBookingForm() {
     setAuthError(null);
   }
 
-  function submit() {
-    if (status !== "authenticated") {
-      router.push("/login?next=/#booking");
-      return;
-    }
+  async function submit() {
+  if (status !== "authenticated") {
+    router.push("/login?next=/#booking");
+    return;
+  }
 
-    const newErrors: Partial<BookingFormState> = {};
+  const newErrors: Partial<BookingFormState> = {};
 
-    if (!form.name.trim()) newErrors.name = "Vui lòng nhập họ và tên";
+  if (!form.name.trim()) newErrors.name = "Vui lòng nhập họ và tên";
+  if (!form.phone.trim()) newErrors.phone = "Vui lòng nhập số điện thoại";
+  if (!form.email.trim()) newErrors.email = "Vui lòng nhập email";
 
-    if (!form.phone.trim()) newErrors.phone = "Vui lòng nhập số điện thoại";
-    else if (!/^\d{9,11}$/.test(form.phone)) newErrors.phone = "Số điện thoại không hợp lệ";
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-    if (!form.email.trim()) newErrors.email = "Vui lòng nhập email";
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = "Email không hợp lệ";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setErrors({});
-
-    const params = new URLSearchParams({
-      ...form,
-      amount: "150000",
+  try {
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        service_id: form.service,
+        clinic_id: form.clinic,
+        amount: 150000,
+      }),
     });
 
-    router.push(`/payment?${params.toString()}`);
+    if (!res.ok) {
+      alert("Không thể tạo booking");
+      return;
+    }
+
+    const data = await res.json();
+
+    router.push(`/payment?bookingId=${data.bookingId}`);
+  } catch (err) {
+    console.error(err);
+    alert("Có lỗi xảy ra");
   }
+}
+
 
   return { update, submit, errors, authError };
 }
