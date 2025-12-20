@@ -1,34 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateSepayQR } from '@/app/lib/payment/sepayqr';
 import { usePayment } from './usePayment';
 
 export default function PaymentClient() {
   const router = useRouter();
-  const { bookingId, name, phone, service, amount } = usePayment();
-
+  const { bookingId, name, service, amount } = usePayment();
   const [copied, setCopied] = useState(false);
-  const [checking, setChecking] = useState(true);
-  const [status, setStatus] = useState<'pending' | 'paid'>('pending');
 
   if (!bookingId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Thiếu thông tin thanh toán
-      </div>
-    );
+    return <div>Thiếu thông tin thanh toán</div>;
   }
 
-  // 🔹 QR SePay (quan trọng: description = DATLICH_<bookingId>)
   const qrUrl = generateSepayQR({
     bankCode: 'VCB',
     accountNo: '0123456789',
     amount,
     description: `DATLICH_${bookingId}`,
   });
-
   // 🔹 Polling kiểm tra trạng thái booking
   useEffect(() => {
     let alive = true;
