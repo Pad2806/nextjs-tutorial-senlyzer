@@ -95,7 +95,7 @@ export default function BookingForm() {
             <option value="">Chọn dịch vụ</option>
             {services.length > 0 &&
               services.map((service) => (
-                <option key={service.id} value={service.name}>
+                <option key={service.id} value={service.id}>
                   {service.name}
                 </option>
               ))}
@@ -108,7 +108,7 @@ export default function BookingForm() {
             <option value="">Chọn phòng khám</option>
             {clinics.length > 0 &&
               clinics.map((clinic) => (
-                <option key={clinic.id} value={clinic.name}>
+                <option key={clinic.id} value={clinic.id}>
                   {clinic.name}
                 </option>
               ))}
