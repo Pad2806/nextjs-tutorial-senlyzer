@@ -5,14 +5,14 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function GET(
   _req: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const bookingId = context.params.id;
+  const { id } = await context.params;
 
   const [booking] = await sql`
     SELECT id, status, amount, created_at
     FROM bookings
-    WHERE id = ${bookingId}
+    WHERE id = ${id}
     LIMIT 1
   `;
 
