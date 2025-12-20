@@ -255,8 +255,8 @@ export default function PaymentClient() {
   }
 
   const qrUrl = generateSepayQR({
-    bankCode: "VCB",
-    accountNo: "0123456789",
+    bankCode: "CTG",
+    accountNo: "106877456357",
     amount: booking.amount,
     description: `DATLICH_${booking.id}`,
   });
