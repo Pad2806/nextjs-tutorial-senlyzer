@@ -1,5 +1,4 @@
 'use client';
-
 import { useSearchParams } from 'next/navigation';
 
 export function usePayment() {
@@ -8,4 +7,3 @@ export function usePayment() {
 
   return { bookingId };
 }
-
