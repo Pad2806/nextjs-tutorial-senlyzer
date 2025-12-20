@@ -50,6 +50,8 @@ async function seedAll() {
       amount INTEGER NOT NULL,
       status TEXT DEFAULT 'pending',
       payment_code TEXT UNIQUE,
+      sepay_payment_code TEXT,
+      sepay_qr_url TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     );
   `;

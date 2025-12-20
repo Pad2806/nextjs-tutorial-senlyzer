@@ -6,53 +6,47 @@ import { usePayment } from "./usePayment";
 import { generateSepayQR } from "@/app/lib/payment/sepayqr";
 
 export default function PaymentClient() {
-  const router = useRouter();
   const { bookingId } = usePayment();
+  const router = useRouter();
 
   const [booking, setBooking] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!bookingId) return;
 
-    fetch(`/api/bookings/${bookingId}`, { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        setBooking(data);
-        setLoading(false);
+    const fetchBooking = async () => {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        cache: "no-store",
       });
-  }, [bookingId]);
+      if (res.ok) {
+        const data = await res.json();
+        setBooking(data);
 
-  if (!bookingId) {
-    return <div className="text-center">Thiếu thông tin thanh toán</div>;
-  }
+        if (data.status === "paid") {
+          router.push(`/result?bookingId=${bookingId}`);
+        }
+      }
+    };
 
-  if (loading) {
-    return <div className="text-center">Đang tải thông tin...</div>;
-  }
+    fetchBooking();
+    const interval = setInterval(fetchBooking, 3000);
+    return () => clearInterval(interval);
+  }, [bookingId, router]);
 
-  if (!booking) {
-    return <div className="text-center">Booking không tồn tại</div>;
-  }
+  if (!bookingId) return <div>Thiếu bookingId</div>;
+  if (!booking) return <div>Đang tải thông tin thanh toán...</div>;
 
   const qrUrl = generateSepayQR({
-    bankCode: "CTG", // VietinBank
-    accountNo: "1133668899", // STK thật
+    bankCode: "VietinBank",
+    accountNo: "106877456357",
     amount: booking.amount,
     description: `DATLICH_${booking.id}`,
   });
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow p-8 space-y-4 text-center">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow p-8 text-center space-y-4">
         <h1 className="text-xl font-semibold">Thanh toán giữ lịch</h1>
-
-        <p>
-          <b>Dịch vụ:</b> {booking.service_name}
-        </p>
-        <p>
-          <b>Số tiền:</b> {booking.amount.toLocaleString()}đ
-        </p>
 
         <img src={qrUrl} className="mx-auto w-64 h-64" />
 
@@ -60,6 +54,10 @@ export default function PaymentClient() {
           Nội dung chuyển khoản:
           <br />
           <b>DATLICH_{booking.id}</b>
+        </p>
+
+        <p className="text-xs text-slate-400">
+          Sau khi chuyển tiền, hệ thống sẽ tự động xác nhận.
         </p>
       </div>
     </main>

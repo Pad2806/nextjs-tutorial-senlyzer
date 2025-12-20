@@ -22,22 +22,22 @@ export const clinics = [
 export const services = [
   {
     name: 'Khám tổng quát',
-    price: 150000,
+    price: 2000,
   },
   {
     name: 'Khám da liễu',
-    price: 200000,
+    price: 2000,
   },
   {
     name: 'Khám nội khoa',
-    price: 3800000,
+    price: 2000,
   },
   {
     name: 'Khám nội tiêu hoá',
-    price: 1800000,
+    price: 2000,
   },
   {
     name: 'Khám nhi',
-    price: 200000,
+    price: 2000,
   },
 ];

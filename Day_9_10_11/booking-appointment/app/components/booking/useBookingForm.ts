@@ -34,6 +34,10 @@ export function useBookingForm() {
   }
 
   async function submit() {
+    if (!form.service || !form.clinic) {
+    alert("Vui lòng chọn dịch vụ và phòng khám");
+    return;
+  }
   if (status !== "authenticated") {
     router.push("/login?next=/#booking");
     return;
@@ -60,15 +64,15 @@ export function useBookingForm() {
         email: form.email,
         service_id: form.service,
         clinic_id: form.clinic,
-        amount: 150000,
+        amount: 2000,
       }),
     });
 
+    console.log(res);
     if (!res.ok) {
       alert("Không thể tạo booking");
       return;
     }
-
     const data = await res.json();
 
     router.push(`/payment?bookingId=${data.bookingId}`);
