@@ -1,12 +1,14 @@
 "use client";
 import { useBookingForm } from "./useBookingForm";
 import { useEffect, useState } from "react";
-
+import { useSession } from "next-auth/react";
 export default function BookingForm() {
   const { update, submit, errors } = useBookingForm();
   const [services, setServices] = useState<{ id: string; name: string }[]>([]);
-
   const [clinics, setClinics] = useState<{ id: string; name: string }[]>([]);
+  const { status } = useSession();
+  const isLoadingSession = status === "loading";
+
   useEffect(() => {
     fetch("/api/services")
       .then((res) => res.json())
@@ -18,7 +20,10 @@ export default function BookingForm() {
   }, []);
 
   return (
-    <div className="max-w-md w-full bg-white rounded-3xl shadow-lg shadow-blue-100 p-8 space-y-8">
+    <div
+      id="booking"
+      className="max-w-md w-full bg-white rounded-3xl shadow-lg shadow-blue-100 p-8 space-y-8"
+    >
       <div>
         <h2 className="text-2xl font-semibold text-slate-900">Đặt lịch khám</h2>
         <p className="text-sm text-slate-500 mt-1">
@@ -76,7 +81,7 @@ export default function BookingForm() {
           >
             <option value="">Chọn dịch vụ</option>
             {services.map((service) => (
-              <option key={service.id} value={service.id}>
+              <option key={service.id} value={service.name}>
                 {service.name}
               </option>
             ))}
@@ -103,10 +108,25 @@ export default function BookingForm() {
 
       <button
         onClick={submit}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4 text-sm font-medium transition"
+        disabled={isLoadingSession}
+        className={`w-full rounded-xl py-4 text-sm font-medium transition
+          ${
+            isLoadingSession
+              ? "bg-slate-300 text-white cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+          }
+        `}
       >
-        Giữ lịch & thanh toán
+        {isLoadingSession
+          ? "Đang kiểm tra đăng nhập..."
+          : "Giữ lịch & thanh toán"}
       </button>
+
+      {status === "unauthenticated" && (
+        <p className="text-xs text-slate-500 text-center">
+          Bạn cần đăng nhập để đặt lịch.
+        </p>
+      )}
     </div>
   );
 }

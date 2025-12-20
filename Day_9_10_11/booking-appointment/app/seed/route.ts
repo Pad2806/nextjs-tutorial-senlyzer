@@ -49,6 +49,7 @@ async function seedAll() {
       email TEXT NOT NULL,
       amount INTEGER NOT NULL,
       status TEXT DEFAULT 'pending',
+      payment_code TEXT UNIQUE,
       created_at TIMESTAMP DEFAULT NOW()
     );
   `;

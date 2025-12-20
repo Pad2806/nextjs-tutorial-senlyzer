@@ -10,12 +10,19 @@ export default function PaymentClient() {
   const { name, phone, service, amount } = usePayment();
   const [copied, setCopied] = useState(false);
 
-  const qrUrl = generateSepayQR({
-    bankCode: 'VCB',
-    accountNo: '0123456789',
-    amount,
-    description: `DATLICH_${phone}`,
-  });
+  // const qrUrl = generateSepayQR({
+  //   bankCode: 'VCB',
+  //   accountNo: '0123456789',
+  //   amount,
+  //   description: `DATLICH_${phone}`,
+  // });
+  generateSepayQR({
+  bankCode: "VCB",
+  accountNo: "0123456789",
+  amount,
+  description: `DATLICH_${bookingId}`,
+});
+
 
   const handleDownload = async () => {
     const res = await fetch(qrUrl);
