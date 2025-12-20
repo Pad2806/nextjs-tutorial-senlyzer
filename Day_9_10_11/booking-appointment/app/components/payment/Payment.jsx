@@ -1,29 +1,76 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateSepayQR } from '@/app/lib/payment/sepayqr';
 import { usePayment } from './usePayment';
 
 export default function PaymentClient() {
   const router = useRouter();
-  const { name, phone, service, amount } = usePayment();
+  const { bookingId, name, phone, service, amount } = usePayment();
+
   const [copied, setCopied] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [status, setStatus] = useState<'pending' | 'paid'>('pending');
 
-  // const qrUrl = generateSepayQR({
-  //   bankCode: 'VCB',
-  //   accountNo: '0123456789',
-  //   amount,
-  //   description: `DATLICH_${phone}`,
-  // });
-  generateSepayQR({
-  bankCode: "VCB",
-  accountNo: "0123456789",
-  amount,
-  description: `DATLICH_${bookingId}`,
-});
+  if (!bookingId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Thiếu thông tin thanh toán
+      </div>
+    );
+  }
 
+  // 🔹 QR SePay (quan trọng: description = DATLICH_<bookingId>)
+  const qrUrl = generateSepayQR({
+    bankCode: 'VCB',
+    accountNo: '0123456789',
+    amount,
+    description: `DATLICH_${bookingId}`,
+  });
 
+  // 🔹 Polling kiểm tra trạng thái booking
+  useEffect(() => {
+    let alive = true;
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`/api/bookings/${bookingId}`, {
+          cache: 'no-store',
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (!alive) return;
+
+        if (data.status === 'paid') {
+          setStatus('paid');
+          setChecking(false);
+
+          // 👉 redirect tự động
+          router.push(`/result?status=paid&bookingId=${bookingId}`);
+        } else {
+          setStatus('pending');
+          setChecking(false);
+        }
+      } catch {
+        if (!alive) return;
+        setChecking(false);
+      }
+    };
+
+    checkStatus(); // check ngay lần đầu
+    const interval = setInterval(checkStatus, 3000);
+
+    return () => {
+      alive = false;
+      clearInterval(interval);
+    };
+  }, [bookingId, router]);
+
+  // 🔹 Download QR
   const handleDownload = async () => {
     const res = await fetch(qrUrl);
     const blob = await res.blob();
@@ -31,11 +78,12 @@ export default function PaymentClient() {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `QR_DATLICH_${phone || 'booking'}.png`;
+    a.download = `QR_DATLICH_${bookingId}.png`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
+  // 🔹 Copy QR
   const handleCopyQR = async () => {
     try {
       const res = await fetch(qrUrl);
@@ -103,28 +151,21 @@ export default function PaymentClient() {
           </button>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-4 text-sm">
-          <p className="font-medium">VIETCOMBANK</p>
-          <p>0123456789</p>
-          <p className="text-blue-600">
-            Nội dung: <b>DATLICH_{phone}</b>
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => router.push(`/result?status=paid&name=${name}`)}
-            className="rounded-xl bg-green-600 text-white py-3"
-          >
-            Đã thanh toán
-          </button>
-
-          <button
-            onClick={() => router.push(`/result?status=unpaid&name=${name}`)}
-            className="rounded-xl bg-slate-200 text-slate-700 py-3"
-          >
-            Chưa thanh toán
-          </button>
+        {/* 🔹 Trạng thái tự động */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          {checking ? (
+            <p>Đang kiểm tra trạng thái thanh toán...</p>
+          ) : status === 'paid' ? (
+            <p className="text-green-600 font-medium">
+              Thanh toán thành công. Đang chuyển trang...
+            </p>
+          ) : (
+            <p>
+              Chưa nhận được thanh toán. Vui lòng chuyển khoản đúng nội dung:
+              <br />
+              <b className="text-blue-600">DATLICH_{bookingId}</b>
+            </p>
+          )}
         </div>
       </div>
     </main>
