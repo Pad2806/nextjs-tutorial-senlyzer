@@ -16,31 +16,25 @@ export async function POST(req: Request) {
 
     const status = payload.transaction_status;
     const amount = payload.transferAmount;
-    const content = payload.content;
+    const paymentCode = payload.payment_code;
 
     if (status !== "success") {
-      return NextResponse.json({ ok: true, ignored: true });
+      return NextResponse.json({ ok: true });
     }
 
-    if (!content || !content.startsWith("DATLICH_")) {
-      return NextResponse.json({ ok: true, ignored: true });
+    if (!paymentCode) {
+      return NextResponse.json({ ok: true });
     }
-
-    const bookingId = content.replace("DATLICH_", "").trim();
 
     const [booking] = await sql`
       SELECT id, amount, status
       FROM bookings
-      WHERE id = ${bookingId}
+      WHERE sepay_payment_code = ${paymentCode}
       LIMIT 1
     `;
 
-    if (!booking) {
-      return NextResponse.json({ ok: true, ignored: true });
-    }
-
-    if (booking.status === "paid") {
-      return NextResponse.json({ ok: true, ignored: true });
+    if (!booking || booking.status === "paid") {
+      return NextResponse.json({ ok: true });
     }
 
     if (Number(amount) !== Number(booking.amount)) {
@@ -51,12 +45,12 @@ export async function POST(req: Request) {
       await tx`
         UPDATE bookings
         SET status = 'paid'
-        WHERE id = ${bookingId}
+        WHERE id = ${booking.id}
       `;
 
       await tx`
         INSERT INTO payments (booking_id, amount, method, status)
-        VALUES (${bookingId}, ${amount}, 'sepay', 'paid')
+        VALUES (${booking.id}, ${amount}, 'sepay', 'paid')
         ON CONFLICT (booking_id) DO NOTHING
       `;
     });

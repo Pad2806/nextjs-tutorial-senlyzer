@@ -20,7 +20,7 @@ export default function PaymentClient() {
   bankCode: "VCB",
   accountNo: "0123456789",
   amount,
-  description: `DATLICH_${bookingId}`,
+  description: `BOOKING_${bookingId}`,
 });
 
 
