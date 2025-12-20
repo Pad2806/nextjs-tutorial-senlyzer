@@ -12,10 +12,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+  async signIn({ user }) {
+    try {
       if (!user.email) return false;
 
-      const existing = await sql`SELECT id FROM users WHERE email = ${user.email}`;
+      const existing = await sql`
+        SELECT id FROM users WHERE email = ${user.email}
+      `;
 
       if (existing.length === 0) {
         await sql`
@@ -25,6 +28,11 @@ export const authOptions: NextAuthOptions = {
       }
 
       return true;
-    },
+    } catch (error) {
+      console.error("SIGNIN CALLBACK ERROR:", error);
+      return false;
+    }
   },
+},
+
 };

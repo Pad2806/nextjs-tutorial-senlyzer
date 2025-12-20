@@ -10,13 +10,26 @@ export default function BookingForm() {
   const isLoadingSession = status === "loading";
 
   useEffect(() => {
-    fetch("/api/services")
-      .then((res) => res.json())
-      .then(setServices);
+    async function loadData() {
+      try {
+        const [servicesRes, clinicsRes] = await Promise.all([
+          fetch("/api/services"),
+          fetch("/api/clinics"),
+        ]);
 
-    fetch("/api/clinics")
-      .then((res) => res.json())
-      .then(setClinics);
+        const servicesData = await servicesRes.json();
+        const clinicsData = await clinicsRes.json();
+
+        setServices(Array.isArray(servicesData) ? servicesData : []);
+        setClinics(Array.isArray(clinicsData) ? clinicsData : []);
+      } catch (error) {
+        console.error("LOAD DATA ERROR:", error);
+        setServices([]);
+        setClinics([]);
+      }
+    }
+
+    loadData();
   }, []);
 
   return (
@@ -80,11 +93,12 @@ export default function BookingForm() {
             onChange={(e) => update("service", e.target.value)}
           >
             <option value="">Chọn dịch vụ</option>
-            {services.map((service) => (
-              <option key={service.id} value={service.name}>
-                {service.name}
-              </option>
-            ))}
+            {services.length > 0 &&
+              services.map((service) => (
+                <option key={service.id} value={service.name}>
+                  {service.name}
+                </option>
+              ))}
           </select>
 
           <select
@@ -92,11 +106,12 @@ export default function BookingForm() {
             onChange={(e) => update("clinic", e.target.value)}
           >
             <option value="">Chọn phòng khám</option>
-            {clinics.map((clinic) => (
-              <option key={clinic.id} value={clinic.id}>
-                {clinic.name}
-              </option>
-            ))}
+            {clinics.length > 0 &&
+              clinics.map((clinic) => (
+                <option key={clinic.id} value={clinic.name}>
+                  {clinic.name}
+                </option>
+              ))}
           </select>
         </div>
       </div>
