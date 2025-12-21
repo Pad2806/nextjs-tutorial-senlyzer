@@ -5,51 +5,60 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function POST(req: NextRequest) {
   try {
-    // 📦 1. READ PAYLOAD
     const payload = await req.json();
     console.log("🔔 SEPAY WEBHOOK PAYLOAD:", payload);
 
-    // 🧾 2. PARSE STATUS
-    const rawStatus =
-      payload?.status ??
-      payload?.state ??
-      payload?.result ??
-      "";
-
-    const status = String(rawStatus).toLowerCase();
-    const isPaid = ["success", "paid", "completed", "ok"].includes(status);
-
-    if (!isPaid) {
+    /**
+     * ✅ 1. XÁC ĐỊNH GIAO DỊCH THÀNH CÔNG
+     * Với SePay: có tiền vào = transferType === 'in'
+     */
+    if (payload?.transferType !== "in") {
       return NextResponse.json({ ok: true });
     }
 
-    // 🧾 3. PARSE CONTENT
-    const content: string =
+    /**
+     * ✅ 2. LẤY NỘI DUNG CHUYỂN KHOẢN
+     */
+    const rawContent =
       payload?.content ??
       payload?.description ??
-      payload?.transactionContent ??
       "";
 
-    if (!content.startsWith("DATLICH_")) {
-      console.error("❌ INVALID CONTENT:", content);
+    if (!rawContent.includes("DATLICH")) {
+      console.error("❌ NO DATLICH TAG:", rawContent);
       return NextResponse.json({ ok: true });
     }
 
-    const bookingId = content.replace("DATLICH_", "").trim();
+    /**
+     * ✅ 3. TÁCH BOOKING ID (HỖ TRỢ CẢ 2 FORMAT)
+     * - DATLICH_<id>
+     * - DATLICH<id>
+     */
+    let bookingId = rawContent;
+
+    bookingId = bookingId.replace("BankAPINotify", "").trim();
+
+    if (bookingId.startsWith("DATLICH_")) {
+      bookingId = bookingId.replace("DATLICH_", "");
+    } else if (bookingId.startsWith("DATLICH")) {
+      bookingId = bookingId.replace("DATLICH", "");
+    }
+
+    bookingId = bookingId.trim();
+
     if (!bookingId) {
+      console.error("❌ EMPTY BOOKING ID");
       return NextResponse.json({ ok: true });
     }
 
-    // 💰 4. PARSE AMOUNT
-    const paidAmount =
-      Number(
-        payload?.amount ??
-        payload?.transferAmount ??
-        payload?.money ??
-        0
-      ) || 0;
+    /**
+     * ✅ 4. LẤY SỐ TIỀN
+     */
+    const paidAmount = Number(payload?.transferAmount ?? 0);
 
-    // 📥 5. LOAD BOOKING
+    /**
+     * ✅ 5. LOAD BOOKING
+     */
     const rows = await sql`
       SELECT id, amount, status
       FROM bookings
@@ -64,12 +73,16 @@ export async function POST(req: NextRequest) {
 
     const booking = rows[0];
 
-    // ♻️ 6. IDEMPOTENT
+    /**
+     * ✅ 6. IDEMPOTENT
+     */
     if (booking.status === "paid") {
       return NextResponse.json({ ok: true, alreadyPaid: true });
     }
 
-    // 💰 7. VALIDATE AMOUNT (>=)
+    /**
+     * ✅ 7. CHECK AMOUNT
+     */
     if (paidAmount < Number(booking.amount)) {
       console.error(
         "❌ AMOUNT NOT ENOUGH:",
@@ -80,7 +93,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // 🔄 8. UPDATE DB
+    /**
+     * ✅ 8. UPDATE DB
+     */
     await sql.begin(async (tx) => {
       await tx`
         UPDATE bookings
