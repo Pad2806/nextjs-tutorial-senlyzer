@@ -12,24 +12,24 @@ export default function PaymentClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!bookingId) return;
+    async function initPayment() {
+      const res = await fetch("/api/payments/sepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId }),
+      });
 
-    fetch("/api/payments/sepay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookingId }),
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error("API ERROR");
-        return res.json();
-      })
-      .then((data) => {
-        setQrUrl(data.qr_url);
-      })
-      .catch(() => setError("Không tạo được mã thanh toán"));
+      if (!res.ok) {
+        throw new Error("CREATE PAYMENT FAILED");
+      }
+
+      const data = await res.json();
+      setQrUrl(data.qr_url);
+    }
+
+    initPayment();
   }, [bookingId]);
 
-  // polling status
   useEffect(() => {
     if (!bookingId) return;
 
