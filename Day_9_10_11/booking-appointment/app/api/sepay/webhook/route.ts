@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
   try {
     // 🔐 1. VERIFY API KEY (BẮT BUỘC)
     const authHeader = req.headers.get("authorization") || "";
-    const expected = `Apikey ${process.env.SEPAY_API_KEY}`;
+    const expected = process.env.SEPAY_API_KEY!;
 
     if (authHeader !== expected) {
       console.error("❌ INVALID API KEY:", authHeader);
