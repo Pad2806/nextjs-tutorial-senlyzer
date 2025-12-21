@@ -147,7 +147,6 @@
 // }
 
 
-
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
@@ -155,54 +154,81 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function POST(req: Request) {
   try {
+    // 🔹 đọc raw payload
     const payload = await req.json();
 
-    /**
-     * Payload thực tế Sepay:
-     * {
-     *   amount: number,
-     *   content: string, // DATLICH<uuid>
-     *   status: "success"
-     * }
-     */
-    const { amount, content, status } = payload;
+    console.log("🔔 SEPAY WEBHOOK PAYLOAD:", payload);
 
-    // ✅ chỉ xử lý giao dịch thành công
-    if (status !== "success" || !content) {
+    // 🔹 map linh hoạt field từ SePay
+    const rawStatus =
+      payload?.status ??
+      payload?.state ??
+      payload?.result ??
+      "";
+
+    const status = String(rawStatus).toLowerCase();
+
+    const isPaid = ["success", "paid", "completed", "ok"].includes(status);
+    if (!isPaid) {
       return NextResponse.json({ ok: true });
     }
 
-    // ✅ TÁCH bookingId (rất quan trọng)
-    // DATLICHxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    if (!content.startsWith("DATLICH")) {
+    const content: string =
+      payload?.content ??
+      payload?.description ??
+      payload?.transactionContent ??
+      "";
+
+    if (!content.startsWith("DATLICH_")) {
       return NextResponse.json({ ok: true });
     }
 
-    const bookingId = content.replace("DATLICH", "").trim();
-
+    // 🔹 tách bookingId ĐÚNG
+    const bookingId = content.replace("DATLICH_", "").trim();
     if (!bookingId) {
       return NextResponse.json({ ok: true });
     }
 
-    // ✅ Lấy booking
-    const [booking] = await sql`
+    const paidAmount =
+      Number(
+        payload?.amount ??
+        payload?.transferAmount ??
+        payload?.money ??
+        0
+      ) || 0;
+
+    // 🔹 lấy booking
+    const rows = await sql`
       SELECT id, amount, status
       FROM bookings
       WHERE id = ${bookingId}
       LIMIT 1
     `;
 
-    if (!booking || booking.status === "paid") {
+    if (rows.length === 0) {
+      console.error("❌ BOOKING NOT FOUND:", bookingId);
       return NextResponse.json({ ok: true });
     }
 
-    // ✅ So khớp tiền
-    if (Number(amount) !== Number(booking.amount)) {
-      console.error("AMOUNT_MISMATCH", amount, booking.amount);
+    const booking = rows[0];
+
+    // 🔹 idempotent
+    if (booking.status === "paid") {
+      return NextResponse.json({ ok: true, alreadyPaid: true });
+    }
+
+    // 🔹 validate amount (cho phép >= để tránh lỗi người dùng chuyển dư)
+    if (paidAmount < Number(booking.amount)) {
+      console.error(
+        "❌ AMOUNT NOT ENOUGH:",
+        paidAmount,
+        "EXPECTED:",
+        booking.amount
+      );
       return NextResponse.json({ ok: true });
     }
 
-    // ✅ Update DB
+    // 🔹 transaction an toàn
     await sql.begin(async (tx) => {
       await tx`
         UPDATE bookings
@@ -212,7 +238,7 @@ export async function POST(req: Request) {
 
       await tx`
         INSERT INTO payments (booking_id, amount, method, status)
-        VALUES (${booking.id}, ${amount}, 'sepay', 'paid')
+        VALUES (${booking.id}, ${paidAmount}, 'sepay', 'paid')
         ON CONFLICT (booking_id) DO NOTHING
       `;
     });
@@ -221,8 +247,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("SEPAY WEBHOOK ERROR:", err);
+    console.error("🔥 SEPAY WEBHOOK ERROR:", err);
     return NextResponse.json({ ok: true });
   }
 }
-
