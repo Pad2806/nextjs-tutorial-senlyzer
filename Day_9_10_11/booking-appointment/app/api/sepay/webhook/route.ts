@@ -5,7 +5,6 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function POST(req: Request) {
   try {
-    // 1️⃣ Verify API key
     const auth = req.headers.get("authorization") || "";
     const expected = `Apikey ${process.env.SEPAY_API_KEY}`;
 
@@ -13,31 +12,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    // 2️⃣ Payload thật từ Sepay
     const payload = await req.json();
 
-    /**
-     * Sepay payload thực tế:
-     * {
-     *   amount: number,
-     *   content: string,
-     *   status: "success"
-     * }
-     */
     const { amount, content, status } = payload;
 
     if (status !== "success") {
       return NextResponse.json({ ok: true });
     }
 
-    if (!content || !content.startsWith("DATLICH-")) {
+    if (!content || !content.startsWith("DATLICH_")) {
       return NextResponse.json({ ok: true });
     }
 
-    // 3️⃣ Extract bookingId
-    const bookingId = content.replace("DATLICH-", "").trim();
+    const bookingId = content.replace("DATLICH_", "").trim();
 
-    // 4️⃣ Load booking
     const [booking] = await sql`
       SELECT id, amount, status
       FROM bookings
@@ -49,12 +37,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    // 5️⃣ Validate amount
     if (Number(amount) !== Number(booking.amount)) {
       return NextResponse.json({ error: "INVALID_AMOUNT" }, { status: 400 });
     }
 
-    // 6️⃣ Update DB
     await sql.begin(async (tx) => {
       await tx`
         UPDATE bookings
