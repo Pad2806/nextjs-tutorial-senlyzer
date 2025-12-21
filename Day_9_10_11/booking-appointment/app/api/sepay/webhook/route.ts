@@ -8,17 +8,10 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
     console.log("🔔 SEPAY WEBHOOK PAYLOAD:", payload);
 
-    /**
-     * ✅ 1. XÁC ĐỊNH GIAO DỊCH THÀNH CÔNG
-     * Với SePay: có tiền vào = transferType === 'in'
-     */
     if (payload?.transferType !== "in") {
       return NextResponse.json({ ok: true });
     }
 
-    /**
-     * ✅ 2. LẤY NỘI DUNG CHUYỂN KHOẢN
-     */
     const rawContent =
       payload?.content ??
       payload?.description ??
@@ -29,11 +22,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    /**
-     * ✅ 3. TÁCH BOOKING ID (HỖ TRỢ CẢ 2 FORMAT)
-     * - DATLICH_<id>
-     * - DATLICH<id>
-     */
     let bookingId = rawContent;
 
     bookingId = bookingId.replace("BankAPINotify", "").trim();
@@ -51,14 +39,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    /**
-     * ✅ 4. LẤY SỐ TIỀN
-     */
     const paidAmount = Number(payload?.transferAmount ?? 0);
 
-    /**
-     * ✅ 5. LOAD BOOKING
-     */
     const rows = await sql`
       SELECT id, amount, status
       FROM bookings
@@ -73,16 +55,10 @@ export async function POST(req: NextRequest) {
 
     const booking = rows[0];
 
-    /**
-     * ✅ 6. IDEMPOTENT
-     */
     if (booking.status === "paid") {
       return NextResponse.json({ ok: true, alreadyPaid: true });
     }
 
-    /**
-     * ✅ 7. CHECK AMOUNT
-     */
     if (paidAmount < Number(booking.amount)) {
       console.error(
         "❌ AMOUNT NOT ENOUGH:",
@@ -93,9 +69,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    /**
-     * ✅ 8. UPDATE DB
-     */
     await sql.begin(async (tx) => {
       await tx`
         UPDATE bookings

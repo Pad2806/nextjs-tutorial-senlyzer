@@ -34,7 +34,6 @@ export default function ResultClient() {
     return <div className="text-center">Booking không tồn tại</div>;
   }
 
-  // 🔹 Render theo status DB
   if (booking.status === "paid") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -75,7 +74,6 @@ export default function ResultClient() {
     );
   }
 
-  // pending
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow p-8 text-center space-y-4">

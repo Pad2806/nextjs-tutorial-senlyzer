@@ -7,7 +7,6 @@ export async function GET(
   _req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  // ✅ BẮT BUỘC await params (Next.js 16)
   const { id } = await context.params;
 
   if (!id) {
@@ -31,7 +30,6 @@ export async function GET(
   const createdAt = new Date(booking.created_at).getTime();
   const now = Date.now();
 
-  // ⏱ auto-expire sau 5 phút
   if (booking.status === "pending" && now - createdAt > 5 * 60 * 1000) {
     await sql`
       UPDATE bookings
