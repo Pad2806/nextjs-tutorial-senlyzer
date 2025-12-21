@@ -19,7 +19,6 @@ export default function PaymentClient() {
       .then(setBooking);
   }, [bookingId]);
 
-  // poll status
   useEffect(() => {
     if (!bookingId) return;
 
