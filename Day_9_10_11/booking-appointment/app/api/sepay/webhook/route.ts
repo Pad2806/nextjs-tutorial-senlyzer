@@ -146,20 +146,27 @@
 //   }
 // }
 
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    // 🔹 đọc raw payload
-    const payload = await req.json();
+    // 🔐 1. VERIFY API KEY (BẮT BUỘC)
+    const authHeader = req.headers.get("authorization") || "";
+    const expected = `Apikey ${process.env.SEPAY_API_KEY}`;
 
+    if (authHeader !== expected) {
+      console.error("❌ INVALID API KEY:", authHeader);
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
+    // 📦 2. READ PAYLOAD
+    const payload = await req.json();
     console.log("🔔 SEPAY WEBHOOK PAYLOAD:", payload);
 
-    // 🔹 map linh hoạt field từ SePay
+    // 🧾 3. PARSE STATUS
     const rawStatus =
       payload?.status ??
       payload?.state ??
@@ -167,12 +174,13 @@ export async function POST(req: Request) {
       "";
 
     const status = String(rawStatus).toLowerCase();
-
     const isPaid = ["success", "paid", "completed", "ok"].includes(status);
+
     if (!isPaid) {
       return NextResponse.json({ ok: true });
     }
 
+    // 🧾 4. PARSE CONTENT
     const content: string =
       payload?.content ??
       payload?.description ??
@@ -180,15 +188,16 @@ export async function POST(req: Request) {
       "";
 
     if (!content.startsWith("DATLICH_")) {
+      console.error("❌ INVALID CONTENT:", content);
       return NextResponse.json({ ok: true });
     }
 
-    // 🔹 tách bookingId ĐÚNG
     const bookingId = content.replace("DATLICH_", "").trim();
     if (!bookingId) {
       return NextResponse.json({ ok: true });
     }
 
+    // 💰 5. PARSE AMOUNT
     const paidAmount =
       Number(
         payload?.amount ??
@@ -197,7 +206,7 @@ export async function POST(req: Request) {
         0
       ) || 0;
 
-    // 🔹 lấy booking
+    // 📥 6. LOAD BOOKING
     const rows = await sql`
       SELECT id, amount, status
       FROM bookings
@@ -212,12 +221,12 @@ export async function POST(req: Request) {
 
     const booking = rows[0];
 
-    // 🔹 idempotent
+    // ♻️ 7. IDEMPOTENT
     if (booking.status === "paid") {
       return NextResponse.json({ ok: true, alreadyPaid: true });
     }
 
-    // 🔹 validate amount (cho phép >= để tránh lỗi người dùng chuyển dư)
+    // 💰 8. VALIDATE AMOUNT (>=)
     if (paidAmount < Number(booking.amount)) {
       console.error(
         "❌ AMOUNT NOT ENOUGH:",
@@ -228,7 +237,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    // 🔹 transaction an toàn
+    // 🔄 9. UPDATE DB
     await sql.begin(async (tx) => {
       await tx`
         UPDATE bookings
@@ -248,6 +257,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("🔥 SEPAY WEBHOOK ERROR:", err);
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ error: "WEBHOOK_ERROR" }, { status: 500 });
   }
 }
