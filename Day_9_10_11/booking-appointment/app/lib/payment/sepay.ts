@@ -17,17 +17,14 @@ export async function createSepayPayment({
     }),
   });
 
+  const raw = await res.text();
+
+  console.error("SEPAY STATUS:", res.status);
+  console.error("SEPAY RESPONSE:", raw);
+
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error("SEPAY_CREATE_FAILED: " + text);
+    throw new Error("SEPAY_CREATE_FAILED");
   }
 
-  return res.json(); 
-  /**
-   * Expected:
-   * {
-   *   qr_url: string,
-   *   payment_code: string
-   * }
-   */
+  return JSON.parse(raw);
 }
