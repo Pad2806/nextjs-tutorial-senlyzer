@@ -57,7 +57,7 @@ async function seedAll() {
   await sql`
     CREATE TABLE IF NOT EXISTS payments (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      booking_id UUID REFERENCES bookings(id),
+      booking_id UUID REFERENCES bookings(id) UNIQUE,
       amount INTEGER NOT NULL,
       method TEXT,
       status TEXT DEFAULT 'pending',
