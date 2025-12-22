@@ -9,14 +9,21 @@ async function seedAll() {
 
   await sql`
     CREATE TABLE IF NOT EXISTS users (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      phone TEXT NOT NULL UNIQUE,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  phone TEXT,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT,
+  provider TEXT NOT NULL DEFAULT 'credentials',
+  provider_id TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
   `;
+await sql`
+  CREATE UNIQUE INDEX IF NOT EXISTS users_provider_unique
+  ON users (provider, provider_id)
+  WHERE provider_id IS NOT NULL;
+`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS clinics (
