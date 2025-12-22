@@ -82,7 +82,7 @@ export function useBookingForm() {
           clinic: form.clinic,
           service: form.service,
           booking_time,
-          amount: 150000,
+          amount: 2000,
         }),
       });
 
