@@ -16,37 +16,19 @@ export async function GET(
     return Response.json({ message: "MISSING_ID" }, { status: 400 });
   }
 
-  // const { data: booking, error } = await supabaseAdmin
-  //   .from("bookings")
-  //   .select(`
-  //     id,
-  //     status,
-  //     created_at,
-  //     payments (
-  //       amount,
-  //       status
-  //     )
-  //   `)
-  //   .eq("id", bookingId)
-  //   .single();
   const { data: booking, error } = await supabaseAdmin
-  .from("bookings")
-  .select(`
-    id,
-    status,
-    created_at,
-    patient_name,
-    clinics (
-      name
-    ),
-    services (
-      name
-    )
-  `)
-  .eq("id", bookingId)
-  .single();
-
-
+    .from("bookings")
+    .select(`
+      id,
+      status,
+      created_at,
+      payments (
+        amount,
+        status
+      )
+    `)
+    .eq("id", bookingId)
+    .single();
 
   if (error || !booking) {
     return Response.json({ message: "NOT_FOUND" }, { status: 404 });
@@ -70,19 +52,10 @@ export async function GET(
     });
   }
 
-  // return Response.json({
-  //   id: booking.id,
-  //   status: booking.status,
-  //   amount,
-  //   created_at: booking.created_at,
-  // });
-
-return Response.json({
-  id: booking.id,
-  status: booking.status,
-  amount,
-  patientName: booking.patient_name,
-  serviceName: booking.services?.[0]?.name ?? "",
-  clinicName: booking.clinics?.[0]?.name ?? "",
-});
+  return Response.json({
+    id: booking.id,
+    status: booking.status,
+    amount,
+    created_at: booking.created_at,
+  });
 }
