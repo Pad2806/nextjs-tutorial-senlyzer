@@ -111,6 +111,7 @@ export default function PaymentClient() {
   const router = useRouter();
   const [booking, setBooking] = useState<BookingResponse | null>(null);
 
+  // LOAD BOOKING
   useEffect(() => {
     if (!bookingId) return;
 
@@ -119,6 +120,7 @@ export default function PaymentClient() {
       .then(setBooking);
   }, [bookingId]);
 
+  // POLLING STATUS
   useEffect(() => {
     if (!bookingId) return;
 
@@ -137,6 +139,14 @@ export default function PaymentClient() {
     return () => clearInterval(timer);
   }, [bookingId, router]);
 
+  // ✅ LOG (HOOK PHẢI Ở TRÊN)
+  useEffect(() => {
+    if (booking) {
+      console.log("BOOKING DATA:", booking);
+    }
+  }, [booking]);
+
+  // RENDER
   if (!booking) return <div>Đang tạo mã thanh toán...</div>;
 
   const qrUrl = generateSepayQR({
@@ -145,67 +155,22 @@ export default function PaymentClient() {
     amount: booking.amount,
     description: `DATLICH_${booking.id}`,
   });
-  useEffect(() => {
-    if (booking) {
-      console.log("BOOKING DATA:", booking);
-    }
-  }, [booking]);
 
-  // return (
-  //   <div className="bg-white p-6 rounded-xl space-y-2 text-center">
-  //     <h2 className="font-semibold text-lg">{booking.clinicName}</h2>
-  //     <p className="text-sm">{booking.serviceName}</p>
-  //     <p className="text-sm text-slate-500">Bệnh nhân: {booking.patientName}</p>
-
-  //     <img src={qrUrl} className="w-64 mx-auto" />
-
-  //     <span
-  //       className={`inline-block px-3 py-1 rounded-full text-sm font-medium
-  //         ${booking.status === "pending" && "bg-orange-100 text-orange-600"}
-  //         ${booking.status === "paid" && "bg-green-100 text-green-600"}
-  //         ${booking.status === "expired" && "bg-red-100 text-red-600"}
-  //       `}
-  //     >
-  //       {booking.status === "pending" && "Chờ thanh toán"}
-  //       {booking.status === "paid" && "Đã thanh toán"}
-  //       {booking.status === "expired" && "Hết hạn"}
-  //     </span>
-  //   </div>
-  // );
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm text-center space-y-4">
-      {/* THÔNG TIN */}
       <div className="space-y-1">
-        <h2 className="text-lg font-semibold text-slate-800">
-          {booking.clinicName}
-        </h2>
-
-        <p className="text-sm text-slate-600">{booking.serviceName}</p>
-
+        <h2 className="text-lg font-semibold">{booking.clinicName}</h2>
+        <p className="text-sm">{booking.serviceName}</p>
         <p className="text-sm text-slate-500">
-          Bệnh nhân: <span className="font-medium">{booking.patientName}</span>
+          Bệnh nhân: <b>{booking.patientName}</b>
         </p>
       </div>
 
-      {/* QR */}
-      <div className="flex justify-center py-2">
-        <img src={qrUrl} className="w-56 h-56" />
-      </div>
+      <img src={qrUrl} className="w-56 h-56 mx-auto" />
 
-      {/* TRẠNG THÁI */}
-      <div>
-        <span
-          className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold
-          ${booking.status === "pending" && "bg-orange-100 text-orange-600"}
-          ${booking.status === "paid" && "bg-green-100 text-green-600"}
-          ${booking.status === "expired" && "bg-red-100 text-red-600"}
-        `}
-        >
-          {booking.status === "pending" && "⏳ Chờ thanh toán"}
-          {booking.status === "paid" && "✅ Đã thanh toán"}
-          {booking.status === "expired" && "❌ Hết hạn"}
-        </span>
-      </div>
+      <span className="inline-flex px-4 py-1.5 rounded-full text-sm font-semibold bg-orange-100 text-orange-600">
+        ⏳ Chờ thanh toán
+      </span>
     </div>
   );
 }
