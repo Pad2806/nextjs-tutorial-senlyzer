@@ -36,11 +36,16 @@ export async function GET(
     status,
     created_at,
     patient_name,
-    clinics ( name ),
-    services ( name )
+    clinics (
+      name
+    ),
+    services (
+      name
+    )
   `)
   .eq("id", bookingId)
   .single();
+
 
 
   if (error || !booking) {

@@ -145,6 +145,11 @@ export default function PaymentClient() {
     amount: booking.amount,
     description: `DATLICH_${booking.id}`,
   });
+  useEffect(() => {
+    if (booking) {
+      console.log("BOOKING DATA:", booking);
+    }
+  }, [booking]);
 
   // return (
   //   <div className="bg-white p-6 rounded-xl space-y-2 text-center">
