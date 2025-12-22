@@ -22,7 +22,6 @@ async function seedAll() {
 await sql`
   CREATE UNIQUE INDEX IF NOT EXISTS users_provider_unique
   ON users (provider, provider_id)
-  WHERE provider_id IS NOT NULL;
 `;
 
   await sql`
