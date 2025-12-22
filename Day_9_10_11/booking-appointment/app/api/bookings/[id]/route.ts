@@ -113,17 +113,18 @@ export async function GET(
       status: "expired",
       amount,
       patientName: booking.patient_name,
-      serviceName: booking.services?.name ?? "",
-      clinicName: booking.clinics?.name ?? "",
+  serviceName: booking.services?.[0]?.name ?? "",
+  clinicName: booking.clinics?.[0]?.name ?? "",
     });
   }
 
   return Response.json({
-    id: booking.id,
-    status: booking.status,
-    amount,
-    patientName: booking.patient_name,
-    serviceName: booking.services?.name ?? "",
-    clinicName: booking.clinics?.name ?? "",
-  });
+  id: booking.id,
+  status: booking.status,
+  amount,
+  patientName: booking.patient_name,
+  serviceName: booking.services?.[0]?.name ?? "",
+  clinicName: booking.clinics?.[0]?.name ?? "",
+});
+
 }
