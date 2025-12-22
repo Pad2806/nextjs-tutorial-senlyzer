@@ -297,6 +297,14 @@ interface SelectProps {
   error?: string;
   icon?: React.ReactNode;
 }
+type BookingResponse = {
+  id: string;
+  status: "pending" | "paid" | "expired";
+  amount: number;
+  patientName: string;
+  serviceName: string;
+  clinicName: string;
+};
 
 /* =======================
    COMPONENT
