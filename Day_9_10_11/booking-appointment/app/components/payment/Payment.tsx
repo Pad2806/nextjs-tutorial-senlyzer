@@ -146,25 +146,61 @@ export default function PaymentClient() {
     description: `DATLICH_${booking.id}`,
   });
 
+  // return (
+  //   <div className="bg-white p-6 rounded-xl space-y-2 text-center">
+  //     <h2 className="font-semibold text-lg">{booking.clinicName}</h2>
+  //     <p className="text-sm">{booking.serviceName}</p>
+  //     <p className="text-sm text-slate-500">Bệnh nhân: {booking.patientName}</p>
+
+  //     <img src={qrUrl} className="w-64 mx-auto" />
+
+  //     <span
+  //       className={`inline-block px-3 py-1 rounded-full text-sm font-medium
+  //         ${booking.status === "pending" && "bg-orange-100 text-orange-600"}
+  //         ${booking.status === "paid" && "bg-green-100 text-green-600"}
+  //         ${booking.status === "expired" && "bg-red-100 text-red-600"}
+  //       `}
+  //     >
+  //       {booking.status === "pending" && "Chờ thanh toán"}
+  //       {booking.status === "paid" && "Đã thanh toán"}
+  //       {booking.status === "expired" && "Hết hạn"}
+  //     </span>
+  //   </div>
+  // );
   return (
-    <div className="bg-white p-6 rounded-xl space-y-2 text-center">
-      <h2 className="font-semibold text-lg">{booking.clinicName}</h2>
-      <p className="text-sm">{booking.serviceName}</p>
-      <p className="text-sm text-slate-500">Bệnh nhân: {booking.patientName}</p>
+    <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm text-center space-y-4">
+      {/* THÔNG TIN */}
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold text-slate-800">
+          {booking.clinicName}
+        </h2>
 
-      <img src={qrUrl} className="w-64 mx-auto" />
+        <p className="text-sm text-slate-600">{booking.serviceName}</p>
 
-      <span
-        className={`inline-block px-3 py-1 rounded-full text-sm font-medium
+        <p className="text-sm text-slate-500">
+          Bệnh nhân: <span className="font-medium">{booking.patientName}</span>
+        </p>
+      </div>
+
+      {/* QR */}
+      <div className="flex justify-center py-2">
+        <img src={qrUrl} className="w-56 h-56" />
+      </div>
+
+      {/* TRẠNG THÁI */}
+      <div>
+        <span
+          className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold
           ${booking.status === "pending" && "bg-orange-100 text-orange-600"}
           ${booking.status === "paid" && "bg-green-100 text-green-600"}
           ${booking.status === "expired" && "bg-red-100 text-red-600"}
         `}
-      >
-        {booking.status === "pending" && "Chờ thanh toán"}
-        {booking.status === "paid" && "Đã thanh toán"}
-        {booking.status === "expired" && "Hết hạn"}
-      </span>
+        >
+          {booking.status === "pending" && "⏳ Chờ thanh toán"}
+          {booking.status === "paid" && "✅ Đã thanh toán"}
+          {booking.status === "expired" && "❌ Hết hạn"}
+        </span>
+      </div>
     </div>
   );
 }
