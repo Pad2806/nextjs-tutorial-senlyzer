@@ -1,0 +1,25 @@
+"use client";
+
+import BookingForm from "@/app/components/booking/BookingForm";
+
+export default function BookingsPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-16">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-900">
+            Đặt lịch khám bệnh
+          </h1>
+          <p className="text-lg text-slate-600 mt-3">
+            Hoàn tất thông tin bên dưới để giữ lịch
+          </p>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 -z-10 bg-blue-200/30 blur-3xl rounded-3xl" />
+          <BookingForm />
+        </div>
+      </div>
+    </div>
+  );
+}

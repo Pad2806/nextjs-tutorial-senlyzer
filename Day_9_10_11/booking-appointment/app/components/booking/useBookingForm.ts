@@ -4,14 +4,21 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
+/* =======================
+   TYPES
+======================= */
 export interface BookingFormState {
   name: string;
   phone: string;
-  email: string;
-  service?: string;
   clinic?: string;
+  service?: string;
+  appointmentDate?: string; // YYYY-MM-DD
+  appointmentTime?: string; // HH:mm
 }
 
+/* =======================
+   HOOK
+======================= */
 export function useBookingForm() {
   const router = useRouter();
   const { status } = useSession();
@@ -19,69 +26,84 @@ export function useBookingForm() {
   const [form, setForm] = useState<BookingFormState>({
     name: "",
     phone: "",
-    email: "",
-    service: "",
     clinic: "",
+    service: "",
+    appointmentDate: "",
+    appointmentTime: "",
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormState>>({});
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function update<K extends keyof BookingFormState>(key: K, value: BookingFormState[K]) {
+  /* UPDATE */
+  function update<K extends keyof BookingFormState>(
+    key: K,
+    value: BookingFormState[K]
+  ) {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
-    setAuthError(null);
   }
 
+  /* VALIDATE */
+  function validateForm(): boolean {
+    const e: Partial<BookingFormState> = {};
+
+    if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
+    if (!form.phone.trim()) e.phone = "Vui lòng nhập số điện thoại";
+    if (!form.clinic) e.clinic = "Chọn phòng khám";
+    if (!form.service) e.service = "Chọn dịch vụ";
+    if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
+    if (!form.appointmentTime) e.appointmentTime = "Chọn giờ";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }
+
+  /* SUBMIT */
   async function submit() {
-    if (!form.service || !form.clinic) {
-    alert("Vui lòng chọn dịch vụ và phòng khám");
-    return;
-  }
-  if (status !== "authenticated") {
-    router.push("/login?next=/#booking");
-    return;
-  }
-
-  const newErrors: Partial<BookingFormState> = {};
-
-  if (!form.name.trim()) newErrors.name = "Vui lòng nhập họ và tên";
-  if (!form.phone.trim()) newErrors.phone = "Vui lòng nhập số điện thoại";
-  if (!form.email.trim()) newErrors.email = "Vui lòng nhập email";
-
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        service_id: form.service,
-        clinic_id: form.clinic,
-        amount: 2000,
-      }),
-    });
-
-    console.log(res);
-    if (!res.ok) {
-      alert("Không thể tạo booking");
+    if (status !== "authenticated") {
+      router.push("/login?next=/bookings");
       return;
     }
-    const data = await res.json();
 
-    router.push(`/payment?bookingId=${data.bookingId}`);
-  } catch (err) {
-    console.error(err);
-    alert("Có lỗi xảy ra");
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const booking_time = `${form.appointmentDate}T${form.appointmentTime}:00`;
+
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          clinic: form.clinic,
+          service: form.service,
+          booking_time,
+          amount: 150000,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Booking failed");
+
+      const data: { bookingId: string } = await res.json();
+      router.push(`/payment?bookingId=${data.bookingId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Có lỗi xảy ra");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
-}
 
-
-  return { update, submit, errors, authError };
+  return {
+    form,
+    update,
+    submit,
+    errors,
+    isSubmitting,
+    status,
+  };
 }

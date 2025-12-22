@@ -1,147 +1,495 @@
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { useBookingForm } from "./useBookingForm";
+// import {
+//   User,
+//   Phone,
+//   Building2,
+//   Stethoscope,
+//   Clock,
+//   Loader2,
+// } from "lucide-react";
+
+// /* =======================
+//    TYPES
+// ======================= */
+
+// interface Option {
+//   id: string;
+//   name: string;
+// }
+
+// interface TimeSlot {
+//   time: string;
+//   capacity: number;
+//   booked: number;
+//   available: number;
+// }
+
+// interface InputProps {
+//   label: string;
+//   value?: string;
+//   type?: string;
+//   icon?: React.ReactNode;
+//   error?: string;
+//   onChange: (value: string) => void;
+// }
+
+// interface SelectOption {
+//   id: string;
+//   name: string;
+// }
+
+// interface SelectProps {
+//   label: string;
+//   value?: string;
+//   options: SelectOption[];
+//   onChange: (value: string) => void;
+//   disabled?: boolean;
+//   error?: string;
+//   icon?: React.ReactNode; // ✅ FIX LỖI Ở ĐÂY
+// }
+
+// /* =======================
+//    COMPONENT
+// ======================= */
+
+// export default function BookingForm() {
+//   const { form, update, submit, errors, isSubmitting } = useBookingForm();
+
+//   const [clinics, setClinics] = useState<Option[]>([]);
+//   const [services, setServices] = useState<Option[]>([]);
+//   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+//   const [loading, setLoading] = useState(true);
+
+//   /* LOAD INIT */
+//   useEffect(() => {
+//     Promise.all([
+//       fetch("/api/clinics").then((r) => r.json()),
+//       fetch("/api/services").then((r) => r.json()),
+//     ]).then(([c, s]) => {
+//       setClinics(c);
+//       setServices(s);
+//       setLoading(false);
+//     });
+//   }, []);
+
+//   /* LOAD TIME SLOTS */
+//   useEffect(() => {
+//     if (!form.clinic || !form.service || !form.appointmentDate) return;
+
+//     fetch(
+//       `/api/available-slots?clinic_id=${form.clinic}&service_id=${form.service}&date=${form.appointmentDate}`
+//     )
+//       .then((r) => r.json())
+//       .then((d: TimeSlot[]) => setTimeSlots(d));
+//   }, [form.clinic, form.service, form.appointmentDate]);
+
+//   if (loading) {
+//     return (
+//       <div className="p-16 flex justify-center">
+//         <Loader2 className="animate-spin w-6 h-6 text-blue-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="bg-white rounded-3xl shadow-xl p-10 space-y-6">
+//       <Input
+//         label="Họ và tên"
+//         icon={<User />}
+//         value={form.name}
+//         error={errors.name}
+//         onChange={(v) => update("name", v)}
+//       />
+
+//       <Input
+//         label="Số điện thoại"
+//         icon={<Phone />}
+//         value={form.phone}
+//         error={errors.phone}
+//         onChange={(v) => update("phone", v)}
+//       />
+
+//       <Select
+//         label="Phòng khám"
+//         icon={<Building2 />}
+//         value={form.clinic}
+//         options={clinics}
+//         error={errors.clinic}
+//         onChange={(v) => {
+//           update("clinic", v);
+//           update("service", "");
+//           update("appointmentDate", "");
+//           update("appointmentTime", "");
+//           setTimeSlots([]);
+//         }}
+//       />
+
+//       <Select
+//         label="Dịch vụ"
+//         icon={<Stethoscope />}
+//         value={form.service}
+//         options={services}
+//         disabled={!form.clinic}
+//         error={errors.service}
+//         onChange={(v) => {
+//           update("service", v);
+//           update("appointmentDate", "");
+//           update("appointmentTime", "");
+//           setTimeSlots([]);
+//         }}
+//       />
+
+//       <Input
+//         label="Ngày khám"
+//         type="date"
+//         icon={<Clock />}
+//         value={form.appointmentDate}
+//         error={errors.appointmentDate}
+//         onChange={(v) => {
+//           update("appointmentDate", v);
+//           update("appointmentTime", "");
+//           setTimeSlots([]);
+//         }}
+//       />
+
+//       <Select
+//         label="Giờ khám"
+//         value={form.appointmentTime}
+//         disabled={timeSlots.length === 0}
+//         options={timeSlots.map((slot) => ({
+//           id: slot.time,
+//           name: `${slot.time} (còn ${slot.available} chỗ)`,
+//         }))}
+//         onChange={(v) => update("appointmentTime", v)}
+//       />
+
+//       <button
+//         onClick={submit}
+//         disabled={isSubmitting}
+//         className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold disabled:bg-slate-400"
+//       >
+//         {isSubmitting ? "Đang xử lý..." : "Xác nhận & thanh toán"}
+//       </button>
+//     </div>
+//   );
+// }
+
+// /* =======================
+//    UI COMPONENTS
+// ======================= */
+
+// function Input({
+//   label,
+//   value,
+//   type = "text",
+//   icon,
+//   error,
+//   onChange,
+// }: InputProps) {
+//   return (
+//     <div>
+//       <label className="text-sm font-medium">{label}</label>
+//       <div className="relative mt-1">
+//         {icon && <span className="absolute left-3 top-3">{icon}</span>}
+//         <input
+//           type={type}
+//           value={value ?? ""}
+//           onChange={(e) => onChange(e.target.value)}
+//           className={`w-full py-3 rounded-xl border ${
+//             icon ? "pl-10" : "pl-4"
+//           } ${error ? "border-red-500" : "border-slate-300"}`}
+//         />
+//       </div>
+//       {error && <p className="text-sm text-red-600">{error}</p>}
+//     </div>
+//   );
+// }
+
+// function Select({
+//   label,
+//   value,
+//   options,
+//   onChange,
+//   disabled,
+//   error,
+//   icon,
+// }: SelectProps) {
+//   return (
+//     <div>
+//       <label className="text-sm font-medium">{label}</label>
+//       <div className="relative mt-1">
+//         {icon && <span className="absolute left-3 top-3">{icon}</span>}
+//         <select
+//           value={value ?? ""}
+//           disabled={disabled}
+//           onChange={(e) => onChange(e.target.value)}
+//           className={`w-full py-3 rounded-xl border ${
+//             icon ? "pl-10" : "pl-4"
+//           } ${
+//             error ? "border-red-500" : "border-slate-300"
+//           } disabled:bg-slate-100`}
+//         >
+//           <option value="">Chọn</option>
+//           {options.map((o) => (
+//             <option key={o.id} value={o.id}>
+//               {o.name}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
+//       {error && <p className="text-sm text-red-600">{error}</p>}
+//     </div>
+//   );
+// }
+
 "use client";
-import { useBookingForm } from "./useBookingForm";
+
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useBookingForm } from "./useBookingForm";
+import {
+  User,
+  Phone,
+  Building2,
+  Stethoscope,
+  Clock,
+  Loader2,
+} from "lucide-react";
+
+/* =======================
+   TYPES
+======================= */
+
+interface Option {
+  id: string;
+  name: string;
+}
+
+interface TimeSlot {
+  time: string; // "HH:mm"
+  capacity: number;
+  booked: number;
+  available: number;
+}
+
+interface InputProps {
+  label: string;
+  value?: string;
+  type?: string;
+  icon?: React.ReactNode;
+  error?: string;
+  onChange: (value: string) => void;
+}
+
+interface SelectOption {
+  id: string;
+  name: string;
+}
+
+interface SelectProps {
+  label: string;
+  value?: string;
+  options: SelectOption[];
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  error?: string;
+  icon?: React.ReactNode;
+}
+
+/* =======================
+   COMPONENT
+======================= */
+
 export default function BookingForm() {
-  const { update, submit, errors } = useBookingForm();
-  const [services, setServices] = useState<{ id: string; name: string }[]>([]);
-  const [clinics, setClinics] = useState<{ id: string; name: string }[]>([]);
-  const { status } = useSession();
-  const isLoadingSession = status === "loading";
+  const { form, update, submit, errors, isSubmitting } = useBookingForm();
 
+  const [clinics, setClinics] = useState<Option[]>([]);
+  const [services, setServices] = useState<Option[]>([]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  /* LOAD INIT */
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [servicesRes, clinicsRes] = await Promise.all([
-          fetch("/api/services"),
-          fetch("/api/clinics"),
-        ]);
-
-        const servicesData = await servicesRes.json();
-        const clinicsData = await clinicsRes.json();
-
-        setServices(Array.isArray(servicesData) ? servicesData : []);
-        setClinics(Array.isArray(clinicsData) ? clinicsData : []);
-      } catch (error) {
-        console.error("LOAD DATA ERROR:", error);
-        setServices([]);
-        setClinics([]);
-      }
-    }
-
-    loadData();
+    Promise.all([
+      fetch("/api/clinics").then((r) => r.json()),
+      fetch("/api/services").then((r) => r.json()),
+    ]).then(([c, s]) => {
+      setClinics(c);
+      setServices(s);
+      setLoading(false);
+    });
   }, []);
 
+  /* LOAD TIME SLOTS */
+  useEffect(() => {
+    if (!form.clinic || !form.service || !form.appointmentDate) return;
+
+    fetch(
+      `/api/available-slots?clinic_id=${form.clinic}&service_id=${form.service}&date=${form.appointmentDate}`,
+      { cache: "no-store" }
+    )
+      .then((r) => r.json())
+      .then((d: TimeSlot[]) => setTimeSlots(d));
+  }, [form.clinic, form.service, form.appointmentDate]);
+
+  if (loading) {
+    return (
+      <div className="p-16 flex justify-center">
+        <Loader2 className="animate-spin w-6 h-6 text-blue-600" />
+      </div>
+    );
+  }
+
   return (
-    <div
-      id="booking"
-      className="max-w-md w-full bg-white rounded-3xl shadow-lg shadow-blue-100 p-8 space-y-8"
-    >
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Đặt lịch khám</h2>
-        <p className="text-sm text-slate-500 mt-1">
-          Thông tin của bạn được bảo mật tuyệt đối
-        </p>
-      </div>
+    <div className="bg-white rounded-3xl shadow-xl p-10 space-y-6">
+      <Input
+        label="Họ và tên"
+        icon={<User />}
+        value={form.name}
+        error={errors.name}
+        onChange={(v) => update("name", v)}
+      />
 
-      <div className="space-y-4">
-        <div>
-          <label className="form-label">Họ và tên *</label>
-          <input
-            className={`form-input ${
-              errors.name ? "border-red-500 focus:ring-red-500" : ""
-            }`}
-            placeholder="Nguyễn Văn A"
-            onChange={(e) => update("name", e.target.value)}
-          />
-          {errors.name && (
-            <p className="text-xs text-red-500 mt-1">{errors.name}</p>
-          )}
-        </div>
+      <Input
+        label="Số điện thoại"
+        icon={<Phone />}
+        value={form.phone}
+        error={errors.phone}
+        onChange={(v) => update("phone", v)}
+      />
 
-        <div>
-          <label className="form-label">Số điện thoại *</label>
-          <input
-            className={`form-input ${
-              errors.phone ? "border-red-500 focus:ring-red-500" : ""
-            }`}
-            placeholder="0901234567"
-            onChange={(e) => update("phone", e.target.value)}
-          />
-          {errors.phone && (
-            <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
-          )}
-        </div>
+      <Select
+        label="Phòng khám"
+        icon={<Building2 />}
+        value={form.clinic}
+        options={clinics}
+        error={errors.clinic}
+        onChange={(v) => {
+          update("clinic", v);
+          update("service", "");
+          update("appointmentDate", "");
+          update("appointmentTime", "");
+          setTimeSlots([]);
+        }}
+      />
 
-        <div>
-          <label className="form-label">Email</label>
-          <input
-            className={`form-input ${
-              errors.email ? "border-red-500 focus:ring-red-500" : ""
-            }`}
-            placeholder="email@example.com"
-            onChange={(e) => update("email", e.target.value)}
-          />
-          {errors.email && (
-            <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-          )}
-        </div>
+      <Select
+        label="Dịch vụ"
+        icon={<Stethoscope />}
+        value={form.service}
+        options={services}
+        disabled={!form.clinic}
+        error={errors.service}
+        onChange={(v) => {
+          update("service", v);
+          update("appointmentDate", "");
+          update("appointmentTime", "");
+          setTimeSlots([]);
+        }}
+      />
 
-        <div className="grid grid-cols-2 gap-4">
-          <select
-            className="form-input"
-            onChange={(e) => update("service", e.target.value)}
-          >
-            <option value="">Chọn dịch vụ</option>
-            {services.length > 0 &&
-              services.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {service.name}
-                </option>
-              ))}
-          </select>
+      <Input
+        label="Ngày khám"
+        type="date"
+        icon={<Clock />}
+        value={form.appointmentDate}
+        error={errors.appointmentDate}
+        onChange={(v) => {
+          update("appointmentDate", v);
+          update("appointmentTime", "");
+          setTimeSlots([]);
+        }}
+      />
 
-          <select
-            className="form-input"
-            onChange={(e) => update("clinic", e.target.value)}
-          >
-            <option value="">Chọn phòng khám</option>
-            {clinics.length > 0 &&
-              clinics.map((clinic) => (
-                <option key={clinic.id} value={clinic.id}>
-                  {clinic.name}
-                </option>
-              ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center bg-blue-50 rounded-xl px-5 py-4">
-        <span className="text-sm text-slate-600">Phí giữ lịch</span>
-        <span className="text-xl font-semibold text-blue-600">150.000đ</span>
-      </div>
+      <Select
+        label="Giờ khám"
+        value={form.appointmentTime}
+        disabled={timeSlots.length === 0}
+        options={timeSlots.map((s) => ({
+          id: s.time,
+          name: `${s.time} (còn ${s.available} chỗ)`,
+        }))}
+        error={errors.appointmentTime}
+        onChange={(v) => update("appointmentTime", v)}
+      />
 
       <button
         onClick={submit}
-        disabled={isLoadingSession}
-        className={`w-full rounded-xl py-4 text-sm font-medium transition
-          ${
-            isLoadingSession
-              ? "bg-slate-300 text-white cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
-          }
-        `}
+        disabled={isSubmitting}
+        className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold disabled:bg-slate-400"
       >
-        {isLoadingSession
-          ? "Đang kiểm tra đăng nhập..."
-          : "Giữ lịch & thanh toán"}
+        {isSubmitting ? "Đang xử lý..." : "Xác nhận & thanh toán"}
       </button>
+    </div>
+  );
+}
 
-      {status === "unauthenticated" && (
-        <p className="text-xs text-slate-500 text-center">
-          Bạn cần đăng nhập để đặt lịch.
-        </p>
-      )}
+/* =======================
+   UI
+======================= */
+
+function Input({
+  label,
+  value,
+  type = "text",
+  icon,
+  error,
+  onChange,
+}: InputProps) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <div className="relative mt-1">
+        {icon && <span className="absolute left-3 top-3">{icon}</span>}
+        <input
+          type={type}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full py-3 rounded-xl border ${
+            icon ? "pl-10" : "pl-4"
+          } ${error ? "border-red-500" : "border-slate-300"}`}
+        />
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+function Select({
+  label,
+  value,
+  options,
+  onChange,
+  disabled,
+  error,
+  icon,
+}: SelectProps) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <div className="relative mt-1">
+        {icon && <span className="absolute left-3 top-3">{icon}</span>}
+        <select
+          value={value ?? ""}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full py-3 rounded-xl border ${
+            icon ? "pl-10" : "pl-4"
+          } ${
+            error ? "border-red-500" : "border-slate-300"
+          } disabled:bg-slate-100`}
+        >
+          <option value="">Chọn</option>
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }

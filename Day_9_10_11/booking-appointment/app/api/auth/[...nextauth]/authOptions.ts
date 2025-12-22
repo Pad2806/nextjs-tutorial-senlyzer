@@ -1,68 +1,133 @@
+// import GoogleProvider from "next-auth/providers/google";
+// import type { NextAuthOptions } from "next-auth";
+// import { supabaseAdmin } from "@/app/lib/supabase/admin";
+
+// export const authOptions: NextAuthOptions = {
+//   providers: [
+//     GoogleProvider({
+//       clientId: process.env.GOOGLE_CLIENT_ID!,
+//       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+//     }),
+//   ],
+
+//   callbacks: {
+//     async signIn({ user, account, profile }) {
+//       try {
+//         if (!user.email || !account || account.provider !== "google") {
+//           return false;
+//         }
+
+//         const providerId = profile?.sub;
+//         if (!providerId) return false;
+
+//         const { error } = await supabaseAdmin
+//           .from("users")
+//           .upsert(
+//             {
+//               name: user.name,
+//               email: user.email,
+//               provider: "google",
+//               provider_id: providerId,
+//               avatar_url: user.image,
+//               is_active: true,
+//             },
+//             {
+//               onConflict: "provider,provider_id",
+//             }
+//           );
+
+//         if (error) {
+//           console.error("Supabase signIn error:", error);
+//           return false;
+//         }
+
+//         return true;
+//       } catch (err) {
+//         console.error("SIGNIN CALLBACK ERROR:", err);
+//         return false;
+//       }
+//     },
+//   },
+// };
+
 import GoogleProvider from "next-auth/providers/google";
 import type { NextAuthOptions } from "next-auth";
-import postgres from "postgres";
-
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 export const authOptions: NextAuthOptions = {
+  session: {
+    strategy: "jwt",
+  },
+
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  // callbacks: {
-  // async signIn({ user }) {
-  //   try {
-  //     if (!user.email) return false;
 
-  //     const existing = await sql`
-  //       SELECT id FROM users WHERE email = ${user.email}
-  //     `;
-
-  //     if (existing.length === 0) {
-  //       await sql`
-  //         INSERT INTO users (name, email, password, phone)
-  //         VALUES (${user.name ?? ""}, ${user.email}, 'google', NULL)
-  //       `;
-  //     }
-
-  //     return true;
-  //   } catch (error) {
-  //     console.error("SIGNIN CALLBACK ERROR:", error);
-  //     return false;
-  //   }
-  // },
   callbacks: {
-  async signIn({ user, account, profile }) {
-    try {
-      if (!user.email || !account) return false;
+    /* ======================
+       SIGN IN
+    ====================== */
+    async signIn({ user, account, profile }) {
+      if (!user.email || account?.provider !== "google") return false;
 
-      // Chỉ xử lý Google OAuth
-      if (account.provider === "google") {
-        const providerId = profile?.sub as string;
+      const providerId = profile?.sub;
+      if (!providerId) return false;
 
-        if (!providerId) return false;
+      const { error } = await supabaseAdmin
+        .from("users")
+        .upsert(
+          {
+            name: user.name,
+            email: user.email,
+            provider: "google",
+            provider_id: providerId,
+            avatar_url: user.image,
+            is_active: true,
+          },
+          {
+            onConflict: "provider,provider_id",
+          }
+        );
 
-        await sql`
-          INSERT INTO users (name, email, provider, provider_id)
-          VALUES (
-            ${user.name ?? ""},
-            ${user.email},
-            'google',
-            ${providerId}
-          )
-          ON CONFLICT (provider, provider_id) DO NOTHING
-        `;
+      if (error) {
+        console.error("Supabase signIn error:", error);
+        return false;
       }
 
       return true;
-    } catch (error) {
-      console.error("SIGNIN CALLBACK ERROR:", error);
-      return false;
-    }
+    },
+
+    /* ======================
+       JWT
+    ====================== */
+    async jwt({ token, user }) {
+      // Lần đầu login
+      if (user?.email) {
+        const { data } = await supabaseAdmin
+          .from("users")
+          .select("id")
+          .eq("email", user.email)
+          .single();
+
+        if (data?.id) {
+          token.userId = data.id;
+        }
+      }
+
+      return token;
+    },
+
+    /* ======================
+       SESSION
+    ====================== */
+    async session({ session, token }) {
+      if (session.user && token.userId) {
+        session.user.id = token.userId as string;
+      }
+      return session;
+    },
   },
-},
-
-
 };
