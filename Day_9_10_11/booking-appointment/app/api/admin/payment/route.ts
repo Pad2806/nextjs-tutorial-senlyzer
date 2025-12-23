@@ -1,6 +1,7 @@
-
-export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/app/lib/supabase/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/authOptions";
 import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 export async function GET(req: NextRequest) {

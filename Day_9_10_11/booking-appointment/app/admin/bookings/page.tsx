@@ -8,7 +8,7 @@ import { BookingTable } from "./BookingTable";
 
 export default function AdminBookingsPage() {
   const { user, isLoading } = useRequireAuth({
-    roles: ["admin", "clinic_admin"],
+    roles: ["admin"],
   });
 
   const [data, setData] = useState<AdminBooking[]>([]);
@@ -21,12 +21,12 @@ export default function AdminBookingsPage() {
 
     setLoading(true);
 
-    fetch(`/api/admin/bookings?phone=${phone}&status=${status}`)
+    fetch(`/api/admin/bookings?phone=${phone}&status=${status}`, {
+      cache: "no-store",
+    })
       .then((res) => res.json())
       .then(setData)
       .finally(() => setLoading(false));
-
-    console.log("ADMIN USER:", user);
   }, [user, phone, status, isLoading]);
 
   if (isLoading) return <p>Loading...</p>;
