@@ -318,33 +318,84 @@ import { useEffect, useState } from "react";
 import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 import { BookingFilters } from "./BookingFilters";
 import { BookingTable } from "./BookingTable";
+import { Pagination } from "@/app/components/Pagination";
 
 export default function AdminBookingsPage() {
-  useRequireAuth({ roles: ["admin"] });
+  const { user, isLoading } = useRequireAuth({ roles: ["admin"] });
 
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState("all");
   const [clinicId, setClinicId] = useState("");
+
   const [clinics, setClinics] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
 
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const limit = 20;
+
+  /* ======================
+     LOAD CLINICS
+  ====================== */
   useEffect(() => {
-    fetch("/api/admin/clinics")
+    fetch("/api/admin/clinics", { cache: "no-store" })
       .then((r) => r.json())
       .then(setClinics);
   }, []);
 
+  /* ======================
+     RESET PAGE WHEN FILTER CHANGES
+  ====================== */
   useEffect(() => {
-    const params = new URLSearchParams({ phone, status, clinicId });
-    fetch(`/api/admin/bookings?${params}`)
-      .then((r) => r.json())
-      .then(setBookings);
+    setPage(1);
   }, [phone, status, clinicId]);
+
+  /* ======================
+     LOAD BOOKINGS (PAGINATION)
+  ====================== */
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    setLoading(true);
+
+    const params = new URLSearchParams({
+      phone,
+      status,
+      clinicId,
+      page: String(page),
+      limit: String(limit),
+    });
+
+    fetch(`/api/admin/bookings?${params.toString()}`, {
+      cache: "no-store",
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        setBookings(res.data ?? []);
+        setTotal(res.total ?? 0);
+      })
+      .finally(() => setLoading(false));
+  }, [user, phone, status, clinicId, page, isLoading]);
+
+  if (isLoading) {
+    return <div className="p-6">Checking permission...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Booking Management</h1>
+      {/* HEADER */}
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">
+          Booking Management
+        </h1>
+        <p className="text-slate-600 mt-1">
+          Manage all patient bookings across clinics
+        </p>
+      </div>
 
+      {/* FILTERS */}
       <BookingFilters
         phone={phone}
         status={status}
@@ -355,7 +406,23 @@ export default function AdminBookingsPage() {
         onClinicChange={setClinicId}
       />
 
-      <BookingTable bookings={bookings} />
+      {/* TABLE */}
+      {loading ? (
+        <div className="bg-white rounded-xl p-12 text-center text-slate-500">
+          Loading bookings...
+        </div>
+      ) : (
+        <>
+          <BookingTable bookings={bookings} />
+
+          <Pagination
+            page={page}
+            limit={limit}
+            total={total}
+            onPageChange={setPage}
+          />
+        </>
+      )}
     </div>
   );
 }
