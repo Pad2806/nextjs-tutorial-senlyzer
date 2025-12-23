@@ -402,31 +402,52 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* HEADER */}
-        <div className="bg-white border rounded-2xl p-6 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-                Booking Management
-              </h1>
-              <p className="text-slate-600 mt-1">
-                Manage patient appointments across clinics
-              </p>
-            </div>
+    // <div className="min-h-screen bg-slate-50 p-6">
+    //   <div className="max-w-7xl mx-auto space-y-6">
+    //     {/* HEADER */}
+    //     <div className="bg-white border rounded-2xl p-6 shadow-sm">
+    //       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    //         <div>
+    //           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+    //             Booking Management
+    //           </h1>
+    //           <p className="text-slate-600 mt-1">
+    //             Manage patient appointments across clinics
+    //           </p>
+    //         </div>
 
-            <div className="flex items-center gap-3">
-              <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
-                Total: <span className="font-semibold">{total}</span>
-              </div>
-              <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
-                Page:{" "}
-                <span className="font-semibold">
-                  {page}/{totalPages}
-                </span>
-              </div>
-            </div>
+    //         <div className="flex items-center gap-3">
+    //           <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
+    //             Total: <span className="font-semibold">{total}</span>
+    //           </div>
+    //           <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
+    //             Page:{" "}
+    //             <span className="font-semibold">
+    //               {page}/{totalPages}
+    //             </span>
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6 shadow-md">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-2">
+            Booking Management
+          </h1>
+          <p className="text-blue-700 mt-1">
+            Manage patient appointments across clinics
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-xl bg-white border border-blue-200 text-sm text-blue-700 shadow-sm">
+            Total: <span className="font-semibold">{total}</span>
+          </div>
+          <div className="px-4 py-2 rounded-xl bg-white border border-blue-200 text-sm text-blue-700 shadow-sm">
+            Page:{" "}
+            <span className="font-semibold">
+              {page}/{totalPages}
+            </span>
           </div>
         </div>
 
@@ -442,7 +463,10 @@ export default function AdminBookingsPage() {
         />
 
         {loading ? (
-          <div className="bg-white border rounded-2xl p-12 text-center text-slate-500 shadow-sm">
+          //   <div className="bg-white border rounded-2xl p-12 text-center text-slate-500 shadow-sm">
+          //     Loading bookings...
+          //   </div>
+          <div className="bg-white border border-blue-200 rounded-2xl p-12 text-center text-blue-600 shadow-sm animate-pulse">
             Loading bookings...
           </div>
         ) : (
@@ -450,7 +474,7 @@ export default function AdminBookingsPage() {
             <BookingTable bookings={bookings} />
 
             {/* FOOTER BAR: Pagination + Page size */}
-            <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            {/* <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-600">Rows per page</span>
@@ -466,7 +490,30 @@ export default function AdminBookingsPage() {
                       </option>
                     ))}
                   </select>
+                </div> */}
+            <div className="bg-white border border-blue-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-blue-700">Rows per page</span>
+                  <select
+                    value={limit}
+                    onChange={(e) => setLimit(Number(e.target.value))}
+                    className="border border-blue-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-400"
+                    disabled={loading}
+                  >
+                    {[10, 20, 50, 100].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+                <Pagination
+                  page={page}
+                  limit={limit}
+                  total={total}
+                  onPageChange={setPage}
+                />
 
                 <Pagination
                   page={page}
