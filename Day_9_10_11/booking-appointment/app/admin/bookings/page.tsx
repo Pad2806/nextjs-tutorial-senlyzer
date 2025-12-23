@@ -314,11 +314,13 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 import { BookingFilters } from "./BookingFilters";
 import { BookingTable } from "./BookingTable";
 import { Pagination } from "@/app/components/Pagination";
+
+type Clinic = { id: string; name: string };
 
 export default function AdminBookingsPage() {
   const { user, isLoading } = useRequireAuth({ roles: ["admin"] });
@@ -327,14 +329,19 @@ export default function AdminBookingsPage() {
   const [status, setStatus] = useState("all");
   const [clinicId, setClinicId] = useState("");
 
-  const [clinics, setClinics] = useState<any[]>([]);
+  const [clinics, setClinics] = useState<Clinic[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
 
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [limit, setLimit] = useState(20);
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(total / limit)),
+    [total, limit]
+  );
 
   /* ======================
      LOAD CLINICS
@@ -342,11 +349,12 @@ export default function AdminBookingsPage() {
   useEffect(() => {
     fetch("/api/admin/clinics", { cache: "no-store" })
       .then((r) => r.json())
-      .then(setClinics);
+      .then((res) => setClinics(Array.isArray(res) ? res : []))
+      .catch(() => setClinics([]));
   }, []);
 
   /* ======================
-     RESET PAGE WHEN FILTER CHANGES
+     RESET PAGE WHEN FILTER/LIMIT CHANGES
   ====================== */
   useEffect(() => {
     setPage(1);
@@ -368,82 +376,115 @@ export default function AdminBookingsPage() {
       limit: String(limit),
     });
 
-    fetch(`/api/admin/bookings?${params.toString()}`, {
-      cache: "no-store",
-    })
+    fetch(`/api/admin/bookings?${params.toString()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((res) => {
-        setBookings(res.data ?? []);
-        setTotal(res.total ?? 0);
+        setBookings(res?.data ?? []);
+        setTotal(res?.total ?? 0);
+      })
+      .catch(() => {
+        setBookings([]);
+        setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [user, phone, status, clinicId, page, isLoading]);
+  }, [user, isLoading, phone, status, clinicId, page, limit]); // ✅ limit bắt buộc
 
   if (isLoading) {
-    return <div className="p-6">Checking permission...</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white border rounded-xl p-6 text-slate-600">
+            Checking permission...
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 space-y-6">
-      {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          Booking Management
-        </h1>
-        <p className="text-slate-600 mt-1">
-          Manage all patient bookings across clinics
-        </p>
-      </div>
-
-      {/* FILTERS */}
-      <BookingFilters
-        phone={phone}
-        status={status}
-        clinicId={clinicId}
-        clinics={clinics}
-        onPhoneChange={setPhone}
-        onStatusChange={setStatus}
-        onClinicChange={setClinicId}
-      />
-
-      {/* TABLE */}
-      {loading ? (
-        <div className="bg-white rounded-xl p-12 text-center text-slate-500">
-          Loading bookings...
-        </div>
-      ) : (
-        <>
-          <BookingTable bookings={bookings} />
-
-          <Pagination
-            page={page}
-            limit={limit}
-            total={total}
-            onPageChange={setPage}
-          />
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm text-slate-600">
-              Showing <span className="font-semibold">{bookings.length}</span>{" "}
-              of <span className="font-semibold">{total}</span> bookings
+    <div className="min-h-screen bg-slate-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* HEADER */}
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                Booking Management
+              </h1>
+              <p className="text-slate-600 mt-1">
+                Manage patient appointments across clinics
+              </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-600">Rows per page:</span>
-              <select
-                value={limit}
-                onChange={(e) => setLimit(Number(e.target.value))}
-                className="border rounded-lg px-3 py-1.5 text-sm bg-white"
-              >
-                {[10, 20, 50, 100].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
+                Total: <span className="font-semibold">{total}</span>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-slate-50 border text-sm text-slate-700">
+                Page:{" "}
+                <span className="font-semibold">
+                  {page}/{totalPages}
+                </span>
+              </div>
             </div>
           </div>
-        </>
-      )}
+        </div>
+
+        {/* FILTERS */}
+        <BookingFilters
+          phone={phone}
+          status={status}
+          clinicId={clinicId}
+          clinics={clinics}
+          onPhoneChange={setPhone}
+          onStatusChange={setStatus}
+          onClinicChange={setClinicId}
+        />
+
+        {/* TABLE */}
+        {loading ? (
+          <div className="bg-white border rounded-2xl p-12 text-center text-slate-500 shadow-sm">
+            Loading bookings...
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <BookingTable bookings={bookings} />
+
+            {/* FOOTER BAR: Pagination + Page size */}
+            <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="text-sm text-slate-600">
+                Showing <span className="font-semibold">{bookings.length}</span>{" "}
+                of <span className="font-semibold">{total}</span> bookings
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-600">Rows per page</span>
+                  <select
+                    value={limit}
+                    onChange={(e) => setLimit(Number(e.target.value))}
+                    className="border rounded-xl px-3 py-2 text-sm bg-white"
+                    disabled={loading}
+                  >
+                    {[10, 20, 50, 100].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <Pagination
+                  page={page}
+                  limit={limit}
+                  total={total}
+                  onPageChange={setPage}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
