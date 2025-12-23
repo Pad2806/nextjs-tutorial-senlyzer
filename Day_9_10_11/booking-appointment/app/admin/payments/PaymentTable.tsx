@@ -85,6 +85,7 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
         <thead className="bg-blue-50 border-b text-xs text-blue-700">
           <tr>
             <th className="px-6 py-3 text-left">Patient</th>
+            <th className="px-6 py-3 text-left">Phone</th>
             <th className="px-6 py-3 text-left">Clinic</th>
             <th className="px-6 py-3 text-left">Service</th>
             <th className="px-6 py-3 text-left">Amount</th>
@@ -110,6 +111,7 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
                   {p.patient_email ?? "—"}
                 </div>
               </td>
+              <td className="px-6 py-4">{p.patient_phone}</td>
               <td className="px-6 py-4">{p.clinic_name}</td>
               <td className="px-6 py-4">{p.service_name}</td>
               <td className="px-6 py-4 font-semibold">
