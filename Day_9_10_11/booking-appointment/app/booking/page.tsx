@@ -31,7 +31,7 @@ import { useRequireAuth } from "../hooks/useRequireAuth";
 import { Loader2 } from "lucide-react";
 
 export default function BookingsPage() {
-  const { isLoading, isAuthenticated } = useRequireAuth("/bookings");
+  const { isLoading, isAuthenticated } = useRequireAuth();
 
   if (isLoading) {
     return (
