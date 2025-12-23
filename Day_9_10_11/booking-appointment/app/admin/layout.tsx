@@ -39,14 +39,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-slate-100">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r">
-        <div className="px-6 py-5 border-b">
-          <h1 className="text-lg font-bold text-blue-700">Clinic Admin</h1>
-        </div>
+      <aside className="w-64 bg-white border-r min-h-screen px-4 py-6">
+        <div className="text-blue-700 font-bold text-lg mb-6">Clinic Admin</div>
 
-        <nav className="p-4 space-y-2">
-          {item("/admin", "Quản lý lịch hẹn")}
-          {item("/admin/payments", "Quản lý thanh toán")}
+        <nav className="space-y-1">
+          <Link
+            href="/admin/bookings"
+            className="block px-4 py-2 rounded-lg text-slate-700 hover:bg-blue-50"
+          >
+            Quản lý lịch hẹn
+          </Link>
+
+          <Link
+            href="/admin/payments"
+            className="block px-4 py-2 rounded-lg text-slate-700 hover:bg-blue-50"
+          >
+            Quản lý thanh toán
+          </Link>
         </nav>
       </aside>
 

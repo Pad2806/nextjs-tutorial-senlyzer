@@ -97,7 +97,7 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
         <tbody className="divide-y">
           {payments.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-12 text-center text-blue-600">
+              <td colSpan={7} className="py-12 text-center text-blue-600">
                 No payments found
               </td>
             </tr>
@@ -115,7 +115,7 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
               <td className="px-6 py-4">{p.clinic_name}</td>
               <td className="px-6 py-4">{p.service_name}</td>
               <td className="px-6 py-4 font-semibold">
-                {p.payment_amount?.toLocaleString()} đ
+                {p.amount?.toLocaleString()} đ
               </td>
               <td className="px-6 py-4">
                 <CreditCard className="inline w-4 h-4 mr-1" />
