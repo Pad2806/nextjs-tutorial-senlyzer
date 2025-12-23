@@ -5,35 +5,26 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 type RequireAuthOptions = {
-  redirectTo?: string;
   roles?: string[];
 };
 
-export function useRequireAuth(
-  options?: RequireAuthOptions | string
-) {
+export function useRequireAuth(options?: RequireAuthOptions) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // Backward compatible
-  const redirectTo =
-    typeof options === "string"
-      ? options
-      : options?.redirectTo ?? "/login";
-
-  const allowedRoles =
-    typeof options === "object" ? options.roles : undefined;
+  const allowedRoles = options?.roles;
 
   useEffect(() => {
     if (status === "loading") return;
 
-    // Chưa đăng nhập
+    // ❌ Chưa đăng nhập → luôn về /login
     if (status === "unauthenticated") {
-      router.push(`${redirectTo}?next=${location.pathname}`);
+      const next = encodeURIComponent(location.pathname);
+      router.push(`/login?next=${next}`);
       return;
     }
 
-    // Có yêu cầu role nhưng user không đủ quyền
+    // ❌ Sai role
     if (
       allowedRoles &&
       session?.user?.role &&
@@ -41,7 +32,7 @@ export function useRequireAuth(
     ) {
       router.push("/403");
     }
-  }, [status, session, allowedRoles, router, redirectTo]);
+  }, [status, session, allowedRoles, router]);
 
   return {
     isLoading: status === "loading",
