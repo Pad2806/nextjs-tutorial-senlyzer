@@ -388,7 +388,7 @@ import { useRequireAuth } from "@/app/hooks/useRequireAuth";
 import { Loader2 } from "lucide-react";
 
 export default function ChatPage() {
-  const { isLoading, isAuthenticated } = useRequireAuth("/chat");
+  const { isLoading, isAuthenticated } = useRequireAuth();
 
   if (isLoading) {
     return (
