@@ -334,7 +334,7 @@ export default function AdminBookingsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const limit = 20;
+  const [limit, setLimit] = useState(20);
 
   /* ======================
      LOAD CLINICS
@@ -350,7 +350,7 @@ export default function AdminBookingsPage() {
   ====================== */
   useEffect(() => {
     setPage(1);
-  }, [phone, status, clinicId]);
+  }, [phone, status, clinicId, limit]);
 
   /* ======================
      LOAD BOOKINGS (PAGINATION)
@@ -421,6 +421,27 @@ export default function AdminBookingsPage() {
             total={total}
             onPageChange={setPage}
           />
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-sm text-slate-600">
+              Showing <span className="font-semibold">{bookings.length}</span>{" "}
+              of <span className="font-semibold">{total}</span> bookings
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-600">Rows per page:</span>
+              <select
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                className="border rounded-lg px-3 py-1.5 text-sm bg-white"
+              >
+                {[10, 20, 50, 100].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </>
       )}
     </div>
