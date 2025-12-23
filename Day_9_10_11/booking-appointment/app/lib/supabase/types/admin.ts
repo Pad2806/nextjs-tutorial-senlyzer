@@ -1,5 +1,6 @@
 export interface AdminBooking {
   booking_id: string;
+   patient_email?: string | null;
   booking_time: string;
   booking_status: string;
   patient_name: string;

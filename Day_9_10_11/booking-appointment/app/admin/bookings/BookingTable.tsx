@@ -121,8 +121,11 @@ export function BookingTable({ bookings }: { bookings: Booking[] }) {
             <tr key={b.booking_id} className="hover:bg-slate-50">
               <td className="px-6 py-4 font-medium">
                 {b.patient_name}
-                <div className="text-xs text-slate-500">{b.clinic_name}</div>
+                <div className="text-xs text-slate-500">
+                  {b.patient_email ?? "—"}
+                </div>
               </td>
+              <td className="px-6 py-4">{b.clinic_name}</td>
               <td className="px-6 py-4">{b.patient_phone}</td>
               <td className="px-6 py-4">
                 {new Date(b.booking_time).toLocaleString()}
