@@ -1,26 +1,13 @@
+
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/app/lib/supabase/client";
+import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-
-  const clinicId = searchParams.get("clinicId");
-  const status = searchParams.get("status");
-
-  if (!clinicId) {
-    return NextResponse.json(
-      { error: "clinicId is required" },
-      { status: 400 }
-    );
-  }
-
-  let query = supabase
+  let query = supabaseAdmin
     .from("admin_payment_overview")
     .select("*")
-    .eq("clinic_id", clinicId)
     .order("payment_date", { ascending: false });
-
-  if (status) query = query.eq("payment_status", status);
 
   const { data, error } = await query;
 
@@ -28,5 +15,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(data ?? []);
 }
+

@@ -1,67 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { AdminBooking } from "@/app/lib/supabase/types/admin";
-
-// export default function AdminBookingsPage() {
-//   const [data, setData] = useState<AdminBooking[]>([]);
-//   const [clinicId, setClinicId] = useState("");
-//   const [phone, setPhone] = useState("");
-
-//   useEffect(() => {
-//     if (!clinicId) return;
-
-//     fetch(`/api/admin/bookings?clinicId=${clinicId}&phone=${phone}`)
-//       .then((res) => res.json())
-//       .then(setData);
-//   }, [clinicId, phone]);
-
-//   return (
-//     <div>
-//       <h1>Booking Management</h1>
-
-//       <input
-//         placeholder="Clinic ID"
-//         value={clinicId}
-//         onChange={(e) => setClinicId(e.target.value)}
-//       />
-
-//       <input
-//         placeholder="Patient phone"
-//         value={phone}
-//         onChange={(e) => setPhone(e.target.value)}
-//       />
-
-//       <table>
-//         <thead>
-//           <tr>
-//             <th>Patient</th>
-//             <th>Phone</th>
-//             <th>Time</th>
-//             <th>Service</th>
-//             <th>Doctor</th>
-//             <th>Status</th>
-//             <th>Payment</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {data.map((b) => (
-//             <tr key={b.booking_id}>
-//               <td>{b.patient_name}</td>
-//               <td>{b.patient_phone}</td>
-//               <td>{new Date(b.booking_time).toLocaleString()}</td>
-//               <td>{b.service_name}</td>
-//               <td>{b.doctor_name}</td>
-//               <td>{b.booking_status}</td>
-//               <td>{b.payment_status ?? "unpaid"}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -83,17 +19,14 @@ export default function AdminBookingsPage() {
   useEffect(() => {
     if (!user || isLoading) return;
 
-    const clinicId = user.clinic_id;
-    if (!clinicId) return;
-
     setLoading(true);
 
-    fetch(
-      `/api/admin/bookings?clinicId=${clinicId}&phone=${phone}&status=${status}`
-    )
+    fetch(`/api/admin/bookings?phone=${phone}&status=${status}`)
       .then((res) => res.json())
       .then(setData)
       .finally(() => setLoading(false));
+
+    console.log("ADMIN USER:", user);
   }, [user, phone, status, isLoading]);
 
   if (isLoading) return <p>Loading...</p>;
