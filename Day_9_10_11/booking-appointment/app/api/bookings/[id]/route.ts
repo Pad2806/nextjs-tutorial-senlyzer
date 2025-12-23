@@ -1,10 +1,9 @@
 import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 function isExpired(createdAt: string, minutes = 5) {
-  const created = new Date(createdAt + "Z").getTime(); // ÉP UTC
+  const created = new Date(createdAt + "Z").getTime();
   return Date.now() - created > minutes * 60 * 1000;
 }
-
 
 export async function GET(
   _req: Request,

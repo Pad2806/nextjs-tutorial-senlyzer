@@ -137,9 +137,6 @@ export async function POST(req: Request) {
 
   const body = await req.json();
 
-  /* =======================
-     1. TẠO BOOKING (pending)
-  ======================= */
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from("bookings")
     .insert({
@@ -151,7 +148,7 @@ export async function POST(req: Request) {
       gender: body.gender ?? null,
       age: body.age ?? null,
       symptoms: body.symptoms ?? null,
-      booking_time: body.booking_time, // YYYY-MM-DDTHH:mm:00
+      booking_time: body.booking_time,
       status: "pending",
     })
     .select("id")
@@ -164,9 +161,6 @@ export async function POST(req: Request) {
     );
   }
 
-  /* =======================
-     2. TẠO PAYMENT (pending)
-  ======================= */
   const { error: paymentError } = await supabaseAdmin
     .from("payments")
     .insert({

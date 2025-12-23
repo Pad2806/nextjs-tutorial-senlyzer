@@ -2,26 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 
-/* =======================
-   TYPES
-======================= */
 export interface BookingFormState {
   name: string;
   phone: string;
   clinic?: string;
   service?: string;
-  appointmentDate?: string; // YYYY-MM-DD
-  appointmentTime?: string; // HH:mm
+  appointmentDate?: string; 
+  appointmentTime?: string; 
 }
 
-/* =======================
-   HOOK
-======================= */
 export function useBookingForm() {
   const router = useRouter();
-  const { status } = useSession();
+  // const { status } = useSession();
 
   const [form, setForm] = useState<BookingFormState>({
     name: "",
@@ -35,7 +29,6 @@ export function useBookingForm() {
   const [errors, setErrors] = useState<Partial<BookingFormState>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* UPDATE */
   function update<K extends keyof BookingFormState>(
     key: K,
     value: BookingFormState[K]
@@ -44,7 +37,6 @@ export function useBookingForm() {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
-  /* VALIDATE */
   function validateForm(): boolean {
     const e: Partial<BookingFormState> = {};
 
@@ -59,12 +51,11 @@ export function useBookingForm() {
     return Object.keys(e).length === 0;
   }
 
-  /* SUBMIT */
   async function submit() {
-    if (status !== "authenticated") {
-      router.push("/login?next=/bookings");
-      return;
-    }
+    // if (status !== "authenticated") {
+    //   router.push("/login?next=/bookings");
+    //   return;
+    // }
 
     if (!validateForm()) return;
 
