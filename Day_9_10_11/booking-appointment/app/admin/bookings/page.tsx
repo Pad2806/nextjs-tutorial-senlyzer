@@ -441,7 +441,6 @@ export default function AdminBookingsPage() {
           onClinicChange={setClinicId}
         />
 
-        {/* TABLE */}
         {loading ? (
           <div className="bg-white border rounded-2xl p-12 text-center text-slate-500 shadow-sm">
             Loading bookings...
@@ -452,11 +451,6 @@ export default function AdminBookingsPage() {
 
             {/* FOOTER BAR: Pagination + Page size */}
             <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div className="text-sm text-slate-600">
-                Showing <span className="font-semibold">{bookings.length}</span>{" "}
-                of <span className="font-semibold">{total}</span> bookings
-              </div>
-
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-600">Rows per page</span>
