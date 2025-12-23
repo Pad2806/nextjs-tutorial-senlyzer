@@ -1,90 +1,88 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { AdminPayment } from "@/app/lib/supabase/types/admin";
-
-// export default function AdminPaymentsPage() {
-//   const [data, setData] = useState<AdminPayment[]>([]);
-//   const [clinicId, setClinicId] = useState("");
-
-//   useEffect(() => {
-//     if (!clinicId) return;
-
-//     fetch(`/api/admin/payments?clinicId=${clinicId}`)
-//       .then((res) => res.json())
-//       .then(setData);
-//   }, [clinicId]);
-
-//   return (
-//     <div>
-//       <h1>Payment Management</h1>
-
-//       <input
-//         placeholder="Clinic ID"
-//         value={clinicId}
-//         onChange={(e) => setClinicId(e.target.value)}
-//       />
-
-//       <table>
-//         <thead>
-//           <tr>
-//             <th>Patient</th>
-//             <th>Booking Time</th>
-//             <th>Amount</th>
-//             <th>Method</th>
-//             <th>Status</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {data.map((p) => (
-//             <tr key={p.payment_id}>
-//               <td>{p.patient_name}</td>
-//               <td>{new Date(p.booking_time).toLocaleString()}</td>
-//               <td>{p.amount}</td>
-//               <td>{p.method}</td>
-//               <td>{p.payment_status}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRequireAuth } from "@/app/hooks/useRequireAuth";
-import { AdminPayment } from "@/app/lib/supabase/types/admin";
+import { PaymentFilters } from "./PaymentFilters";
 import { PaymentTable } from "./PaymentTable";
+import { Pagination } from "@/app/components/Pagination";
 
 export default function AdminPaymentsPage() {
-  const { user, isLoading } = useRequireAuth({
-    roles: ["admin", "clinic_admin"],
-  });
+  useRequireAuth({ roles: ["admin"] });
 
-  const [data, setData] = useState<AdminPayment[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [clinics, setClinics] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+
+  const [clinicId, setClinicId] = useState("");
+  const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState("all");
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    if (!user || isLoading) return;
-    if (!user.clinic_id) return;
+    fetch("/api/admin/clinics")
+      .then((r) => r.json())
+      .then(setClinics);
+  }, []);
 
-    setLoading(true);
+  useEffect(() => {
+    setPage(1);
+  }, [clinicId, phone, status, limit]);
 
-    fetch(`/api/admin/payments?clinicId=${user.clinic_id}`)
-      .then((res) => res.json())
-      .then(setData)
-      .finally(() => setLoading(false));
-  }, [user, isLoading]);
+  useEffect(() => {
+    const params = new URLSearchParams({
+      clinicId,
+      phone,
+      status,
+      page: String(page),
+      limit: String(limit),
+    });
 
-  if (isLoading) return <p>Loading...</p>;
+    fetch(`/api/admin/payments?${params}`, { cache: "no-store" })
+      .then((r) => r.json())
+      .then((res) => {
+        setPayments(res.data ?? []);
+        setTotal(res.total ?? 0);
+      });
+  }, [clinicId, phone, status, page, limit]);
 
   return (
-    <div>
-      <h1>Payment Management</h1>
+    <div className="min-h-screen bg-slate-50 p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Payment Management</h1>
 
-      {loading ? <p>Loading data...</p> : <PaymentTable data={data} />}
+      <PaymentFilters
+        clinicId={clinicId}
+        clinics={clinics}
+        phone={phone}
+        status={status}
+        onClinicChange={setClinicId}
+        onPhoneChange={setPhone}
+        onStatusChange={setStatus}
+      />
+
+      <PaymentTable payments={payments} />
+
+      <div className="flex justify-between items-center bg-white border rounded-2xl p-4">
+        <select
+          value={limit}
+          onChange={(e) => setLimit(Number(e.target.value))}
+          className="border rounded-xl px-3 py-2"
+        >
+          {[10, 20, 50, 100].map((n) => (
+            <option key={n} value={n}>
+              {n} rows
+            </option>
+          ))}
+        </select>
+
+        <Pagination
+          page={page}
+          limit={limit}
+          total={total}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }
