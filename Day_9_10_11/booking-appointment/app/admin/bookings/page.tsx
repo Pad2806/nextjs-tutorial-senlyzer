@@ -580,7 +580,7 @@ export default function AdminBookingsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-2">
-                🏥 Booking Management
+                Booking Management
               </h1>
               <p className="text-blue-700 mt-1">
                 Manage patient appointments across clinics
@@ -613,22 +613,28 @@ export default function AdminBookingsPage() {
 
         {loading ? (
           <div className="bg-white border border-blue-200 rounded-2xl p-12 text-center text-blue-600 shadow-sm animate-pulse">
-            ⏳ Loading bookings...
+            Loading bookings...
           </div>
         ) : (
           <div className="space-y-4">
             <BookingTable bookings={bookings} />
 
             {/* FOOTER BAR: Pagination + Page size */}
-            <div className="bg-white border border-blue-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-blue-700">Rows per page</span>
+            <div className="bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                {/* LEFT: ROWS PER PAGE */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-blue-700">
+                    Rows per page
+                  </span>
+
                   <select
                     value={limit}
                     onChange={(e) => setLimit(Number(e.target.value))}
-                    className="border border-blue-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-400"
                     disabled={loading}
+                    className="border border-blue-300 rounded-xl px-3 py-2 text-sm bg-white
+                   focus:ring-2 focus:ring-blue-400 focus:outline-none
+                   disabled:opacity-50"
                   >
                     {[10, 20, 50, 100].map((n) => (
                       <option key={n} value={n}>
@@ -638,12 +644,15 @@ export default function AdminBookingsPage() {
                   </select>
                 </div>
 
-                <Pagination
-                  page={page}
-                  limit={limit}
-                  total={total}
-                  onPageChange={setPage}
-                />
+                {/* RIGHT: PAGINATION */}
+                <div className="flex items-center justify-end">
+                  <Pagination
+                    page={page}
+                    limit={limit}
+                    total={total}
+                    onPageChange={setPage}
+                  />
+                </div>
               </div>
             </div>
           </div>
