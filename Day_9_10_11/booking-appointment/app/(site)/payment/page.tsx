@@ -1,16 +1,16 @@
 import { Suspense } from "react";
-import ResultClient from "../components/result/Result";
+import PaymentClient from "../../components/payment/Payment";
 
-export default function ResultPage() {
+export default function PaymentPage() {
   return (
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          Đang xử lý kết quả...
+          Đang tải thông tin thanh toán...
         </div>
       }
     >
-      <ResultClient />
+      <PaymentClient />
     </Suspense>
   );
 }

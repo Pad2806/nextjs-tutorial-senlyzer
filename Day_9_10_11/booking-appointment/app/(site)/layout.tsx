@@ -2,7 +2,7 @@ import "./globals.css";
 import { Be_Vietnam_Pro } from "next/font/google";
 import AuthProvider from "@/app/provider/SessionProvider";
 import Header from "@/app/components/layout/Header";
-import Footer from "./components/layout/Footer";
+import Footer from "../components/layout/Footer";
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin"],
