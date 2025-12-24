@@ -66,6 +66,7 @@ npm run dev
 Mở trình duyệt và truy cập: [http://localhost:3000](http://localhost:3000)
 
 ## 5. Demo
-*Link demo sản phẩm sẽ được cập nhật tại đây.*
+https://booking-clinic.vercel.app/
+
 Admin: admin@clinicbooking.vn
 Password: 123456
