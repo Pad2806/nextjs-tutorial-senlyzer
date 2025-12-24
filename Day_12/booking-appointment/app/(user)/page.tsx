@@ -100,7 +100,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: Carousel */}
             <div className="relative">
               <div className="bg-white rounded-3xl shadow-2xl p-8 space-y-6">
                 {carouselItems.map((item, index) => {

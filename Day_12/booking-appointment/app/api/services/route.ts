@@ -1,17 +1,14 @@
-import postgres from "postgres";
+import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-async function listServices() {
-  const services = await sql`
-    SELECT id, name FROM services ORDER BY name
-  `;
-  return services;
-}
 export async function GET() {
-  try {
-    return Response.json(await listServices());
-  } catch (error) {
-    return Response.json({ error }, { status: 500 });
+  const { data, error } = await supabaseAdmin
+    .from("services")
+    .select("id, name")
+    .order("name", { ascending: true });
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
   }
+
+  return Response.json(data ?? []);
 }

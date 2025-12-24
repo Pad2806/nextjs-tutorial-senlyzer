@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import postgres from "postgres";
+import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const payload = await req.json();
     console.log("🔔 SEPAY WEBHOOK PAYLOAD:", payload);
 
     if (payload?.transferType !== "in") {
-      return NextResponse.json({ ok: true });
+      return Response.json({ ok: true });
     }
 
     const rawContent =
@@ -19,12 +16,10 @@ export async function POST(req: NextRequest) {
 
     if (!rawContent.includes("DATLICH")) {
       console.error("❌ NO DATLICH TAG:", rawContent);
-      return NextResponse.json({ ok: true });
+      return Response.json({ ok: true });
     }
 
-    let bookingId = rawContent;
-
-    bookingId = bookingId.replace("BankAPINotify", "").trim();
+    let bookingId = rawContent.replace("BankAPINotify", "").trim();
 
     if (bookingId.startsWith("DATLICH_")) {
       bookingId = bookingId.replace("DATLICH_", "");
@@ -36,58 +31,68 @@ export async function POST(req: NextRequest) {
 
     if (!bookingId) {
       console.error("❌ EMPTY BOOKING ID");
-      return NextResponse.json({ ok: true });
+      return Response.json({ ok: true });
     }
 
     const paidAmount = Number(payload?.transferAmount ?? 0);
 
-    const rows = await sql`
-      SELECT id, amount, status
-      FROM bookings
-      WHERE id = ${bookingId}
-      LIMIT 1
-    `;
+    const { data: booking, error: bookingErr } = await supabaseAdmin
+      .from("bookings")
+      .select("id, status")
+      .eq("id", bookingId)
+      .single();
 
-    if (rows.length === 0) {
+    if (bookingErr || !booking) {
       console.error("❌ BOOKING NOT FOUND:", bookingId);
-      return NextResponse.json({ ok: true });
+      return Response.json({ ok: true });
     }
-
-    const booking = rows[0];
 
     if (booking.status === "paid") {
-      return NextResponse.json({ ok: true, alreadyPaid: true });
+      return Response.json({ ok: true, alreadyPaid: true });
     }
 
-    if (paidAmount < Number(booking.amount)) {
+    const { data: payment, error: payErr } = await supabaseAdmin
+      .from("payments")
+      .select("id, amount, status")
+      .eq("booking_id", booking.id)
+      .eq("status", "pending")
+      .single();
+
+    if (payErr || !payment) {
+      console.error("❌ PAYMENT NOT FOUND:", bookingId);
+      return Response.json({ ok: true });
+    }
+
+    if (paidAmount < Number(payment.amount)) {
       console.error(
         "❌ AMOUNT NOT ENOUGH:",
         paidAmount,
         "EXPECTED:",
-        booking.amount
+        payment.amount
       );
-      return NextResponse.json({ ok: true });
+      return Response.json({ ok: true });
     }
 
-    await sql.begin(async (tx) => {
-      await tx`
-        UPDATE bookings
-        SET status = 'paid'
-        WHERE id = ${booking.id}
-      `;
+    await supabaseAdmin
+      .from("payments")
+      .update({
+        status: "paid",
+        method: "sepay",
+        transaction_code: payload?.referenceCode ?? null,
+        payment_date: new Date().toISOString(),
+      })
+      .eq("id", payment.id)
 
-      await tx`
-        INSERT INTO payments (booking_id, amount, method, status)
-        VALUES (${booking.id}, ${paidAmount}, 'sepay', 'paid')
-        ON CONFLICT (booking_id) DO NOTHING
-      `;
-    });
+    await supabaseAdmin
+      .from("bookings")
+      .update({ status: "paid" })
+      .eq("id", booking.id);
 
     console.log("✅ BOOKING PAID:", bookingId);
 
-    return NextResponse.json({ success: true });
+    return Response.json({ success: true });
   } catch (err) {
     console.error("🔥 SEPAY WEBHOOK ERROR:", err);
-    return NextResponse.json({ error: "WEBHOOK_ERROR" }, { status: 500 });
+    return Response.json({ error: "WEBHOOK_ERROR" }, { status: 500 });
   }
 }

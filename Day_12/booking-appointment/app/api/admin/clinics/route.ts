@@ -1,14 +1,17 @@
+export const dynamic = "force-dynamic";
+
+import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("clinics")
     .select("id, name")
-    .order("name", { ascending: true });
+    .order("name");
 
   if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 
-  return Response.json(data ?? []);
+  return NextResponse.json(data ?? []);
 }
