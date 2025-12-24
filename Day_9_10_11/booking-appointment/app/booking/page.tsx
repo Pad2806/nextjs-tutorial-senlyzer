@@ -27,7 +27,7 @@
 "use client";
 
 import BookingForm from "@/app/components/booking/BookingForm";
-import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { useRequireAuth } from "../hooks/useRequireAuth";
 import { Loader2 } from "lucide-react";
 
 export default function BookingsPage() {
