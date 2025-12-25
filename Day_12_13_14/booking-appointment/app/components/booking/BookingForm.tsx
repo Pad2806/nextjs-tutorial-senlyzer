@@ -58,11 +58,13 @@ type BookingResponse = {
 
 export default function BookingForm() {
   const { form, update, submit, errors, isSubmitting } = useBookingForm();
-
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const minDate = today.toLocaleDateString("en-CA");
 
   useEffect(() => {
     Promise.all([
@@ -93,7 +95,6 @@ export default function BookingForm() {
       </div>
     );
   }
-  const today = new Date().toISOString().split("T")[0];
 
   return (
     <div className="bg-white rounded-3xl shadow-xl p-10 space-y-6">
@@ -149,7 +150,7 @@ export default function BookingForm() {
         icon={<Clock />}
         value={form.appointmentDate}
         error={errors.appointmentDate}
-        min={today}
+        min={minDate}
         onChange={(v) => {
           update("appointmentDate", v);
           update("appointmentTime", "");
