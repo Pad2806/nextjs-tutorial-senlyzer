@@ -17,7 +17,7 @@ interface Option {
 }
 
 interface TimeSlot {
-  time: string; 
+  time: string;
   capacity: number;
   booked: number;
   available: number;
@@ -29,6 +29,7 @@ interface InputProps {
   type?: string;
   icon?: React.ReactNode;
   error?: string;
+  min?: string;
   onChange: (value: string) => void;
 }
 
@@ -54,7 +55,6 @@ type BookingResponse = {
   serviceName: string;
   clinicName: string;
 };
-
 
 export default function BookingForm() {
   const { form, update, submit, errors, isSubmitting } = useBookingForm();
@@ -93,6 +93,7 @@ export default function BookingForm() {
       </div>
     );
   }
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <div className="bg-white rounded-3xl shadow-xl p-10 space-y-6">
@@ -148,6 +149,7 @@ export default function BookingForm() {
         icon={<Clock />}
         value={form.appointmentDate}
         error={errors.appointmentDate}
+        min={today}
         onChange={(v) => {
           update("appointmentDate", v);
           update("appointmentTime", "");
@@ -184,6 +186,7 @@ function Input({
   type = "text",
   icon,
   error,
+  min,
   onChange,
 }: InputProps) {
   return (
@@ -194,6 +197,7 @@ function Input({
         <input
           type={type}
           value={value ?? ""}
+          min={min}
           onChange={(e) => onChange(e.target.value)}
           className={`w-full py-3 rounded-xl border ${
             icon ? "pl-10" : "pl-4"
