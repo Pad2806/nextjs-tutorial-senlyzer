@@ -39,7 +39,11 @@ export function useBookingForm() {
     const e: Partial<BookingFormState> = {};
 
     if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
-    if (!form.phone.trim()) e.phone = "Vui lòng nhập số điện thoại";
+    if (!form.phone.trim()) {
+      e.phone = "Vui lòng nhập số điện thoại";
+    } else if (!/^\d{10}$/.test(form.phone.trim())) {
+      e.phone = "Số điện thoại phải có 10 chữ số";
+    }
     if (!form.clinic) e.clinic = "Chọn phòng khám";
     if (!form.service) e.service = "Chọn dịch vụ";
     if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";

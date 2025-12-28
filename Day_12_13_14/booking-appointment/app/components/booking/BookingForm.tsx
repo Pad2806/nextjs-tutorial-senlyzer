@@ -61,6 +61,7 @@ export default function BookingForm() {
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [hasCheckedSlots, setHasCheckedSlots] = useState(false);
   const [loading, setLoading] = useState(true);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -78,14 +79,21 @@ export default function BookingForm() {
   }, []);
 
   useEffect(() => {
-    if (!form.clinic || !form.service || !form.appointmentDate) return;
+    if (!form.clinic || !form.service || !form.appointmentDate) {
+      setHasCheckedSlots(false);
+      return;
+    }
 
+    setHasCheckedSlots(false);
     fetch(
       `/api/available-slots?clinic_id=${form.clinic}&service_id=${form.service}&date=${form.appointmentDate}`,
       { cache: "no-store" }
     )
       .then((r) => r.json())
-      .then((d: TimeSlot[]) => setTimeSlots(d));
+      .then((d: TimeSlot[]) => {
+        setTimeSlots(d);
+        setHasCheckedSlots(true);
+      });
   }, [form.clinic, form.service, form.appointmentDate]);
 
   if (loading) {
@@ -169,6 +177,12 @@ export default function BookingForm() {
         error={errors.appointmentTime}
         onChange={(v) => update("appointmentTime", v)}
       />
+
+      {hasCheckedSlots && timeSlots.length === 0 && (
+        <div className="p-4 bg-orange-50 text-orange-600 rounded-xl border border-orange-200 text-sm font-medium text-center">
+          Rất tiếc, đã kín lịch cho ngày này. Vui lòng chọn ngày khác.
+        </div>
+      )}
 
       <button
         onClick={submit}
