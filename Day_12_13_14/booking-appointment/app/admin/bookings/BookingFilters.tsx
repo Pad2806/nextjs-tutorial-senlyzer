@@ -25,14 +25,10 @@ export function BookingFilters({
 }: Props) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-      <div className="flex items-center gap-2 text-slate-700">
-        <Filter className="w-5 h-5" />
-        <h2 className="font-semibold text-lg">Bộ lọc</h2>
-      </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="text-sm font-medium">Phòng khám</label>
+          <label className="text-sm font-medium text-blue-700">Phòng khám</label>
           <div className="relative mt-1">
             <Building2 className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
             <select
@@ -51,7 +47,7 @@ export function BookingFilters({
         </div>
 
         <div>
-          <label className="text-sm font-medium">SĐT Bệnh nhân</label>
+          <label className="text-sm font-medium text-blue-700">SĐT Bệnh nhân</label>
           <div className="relative mt-1">
             <Phone className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
             <input
@@ -64,7 +60,7 @@ export function BookingFilters({
         </div>
 
         <div>
-          <label className="text-sm font-medium">Trạng thái</label>
+          <label className="text-sm font-medium text-blue-700">Trạng thái</label>
           <select
             value={status}
             onChange={(e) => onStatusChange(e.target.value)}
