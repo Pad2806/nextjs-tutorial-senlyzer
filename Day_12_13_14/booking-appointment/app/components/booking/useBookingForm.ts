@@ -8,6 +8,9 @@ export interface BookingFormState {
   phone: string;
   clinic?: string;
   service?: string;
+  gender?: string;
+  age?: string;
+  symptoms?: string;
   appointmentDate?: string;
   appointmentTime?: string;
 }
@@ -18,6 +21,9 @@ export function useBookingForm() {
   const [form, setForm] = useState<BookingFormState>({
     name: "",
     phone: "",
+    gender: "",
+    age: "",
+    symptoms: "",
     clinic: "",
     service: "",
     appointmentDate: "",
@@ -44,6 +50,12 @@ export function useBookingForm() {
     } else if (!/^\d{10}$/.test(form.phone.trim())) {
       e.phone = "Số điện thoại phải có 10 chữ số";
     }
+    if (!form.gender) e.gender = "Chọn giới tính";
+    if (!form.age) {
+      e.age = "Nhập tuổi";
+    } else if (Number(form.age) <= 0) {
+      e.age = "Tuổi không hợp lệ";
+    }
     if (!form.clinic) e.clinic = "Chọn phòng khám";
     if (!form.service) e.service = "Chọn dịch vụ";
     if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
@@ -68,6 +80,9 @@ export function useBookingForm() {
         body: JSON.stringify({
           name: form.name,
           phone: form.phone,
+          gender: form.gender,
+          age: Number(form.age),
+          symptoms: form.symptoms,
           clinic: form.clinic,
           service: form.service,
           booking_time,

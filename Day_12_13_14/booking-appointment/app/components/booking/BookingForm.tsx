@@ -9,6 +9,9 @@ import {
   Stethoscope,
   Clock,
   Loader2,
+  Users,
+  Calendar,
+  FileText,
 } from "lucide-react";
 
 interface Option {
@@ -120,6 +123,37 @@ export default function BookingForm() {
         value={form.phone}
         error={errors.phone}
         onChange={(v) => update("phone", v)}
+      />
+
+      <div className="grid grid-cols-2 gap-4">
+        <Select
+          label="Giới tính"
+          icon={<Users />}
+          value={form.gender}
+          options={[
+            { id: "male", name: "Nam" },
+            { id: "female", name: "Nữ" },
+            { id: "other", name: "Khác" },
+          ]}
+          error={errors.gender}
+          onChange={(v) => update("gender", v)}
+        />
+        <Input
+          label="Tuổi"
+          type="number"
+          icon={<Calendar />}
+          value={form.age}
+          error={errors.age}
+          onChange={(v) => update("age", v)}
+        />
+      </div>
+
+      <TextArea
+        label="Mô tả bệnh lý"
+        icon={<FileText />}
+        value={form.symptoms}
+        error={errors.symptoms}
+        onChange={(v) => update("symptoms", v)}
       />
 
       <Select
@@ -255,6 +289,38 @@ function Select({
             </option>
           ))}
         </select>
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+function TextArea({
+  label,
+  value,
+  icon,
+  error,
+  onChange,
+}: {
+  label: string;
+  value?: string;
+  icon?: React.ReactNode;
+  error?: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <div className="relative mt-1">
+        {icon && <span className="absolute left-3 top-3">{icon}</span>}
+        <textarea
+          rows={3}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full py-3 rounded-xl border ${
+            icon ? "pl-10" : "pl-4"
+          } ${error ? "border-red-500" : "border-slate-300"}`}
+        />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
