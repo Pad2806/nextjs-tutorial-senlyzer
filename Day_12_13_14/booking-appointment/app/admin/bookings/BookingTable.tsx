@@ -34,17 +34,17 @@ export function BookingTable({ bookings }: { bookings: Booking[] }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-x-auto border border-slate-100">
-      <table className="w-full min-w-[1000px]">
+      <table className="w-full min-w-[1200px]">
         <thead className="bg-slate-50 border-b text-xs text-slate-500 uppercase tracking-wider">
           <tr>
-            <th className="px-6 py-4 text-left font-semibold">Bệnh nhân</th>
-            <th className="px-6 py-4 text-left font-semibold">Phòng khám</th>
-            <th className="px-6 py-4 text-left font-semibold">SĐT</th>
-            <th className="px-6 py-4 text-left font-semibold">Thời gian</th>
-            <th className="px-6 py-4 text-left font-semibold">Dịch vụ</th>
-            <th className="px-6 py-4 text-left font-semibold">Bác sĩ</th>
-            <th className="px-6 py-4 text-left font-semibold">Trạng thái</th>
-            <th className="px-6 py-4 text-left font-semibold">Thanh toán</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[200px]">Bệnh nhân</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[200px]">Phòng khám</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">SĐT</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Thời gian</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[150px]">Dịch vụ</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Bác sĩ</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Trạng thái</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Thanh toán</th>
             <th className="px-6 py-4"></th>
           </tr>
         </thead>
@@ -68,13 +68,13 @@ export function BookingTable({ bookings }: { bookings: Booking[] }) {
                 </div>
               </td>
               <td className="px-6 py-4 text-slate-700">{b.clinic_name}</td>
-              <td className="px-6 py-4 text-slate-700">{b.patient_phone}</td>
-              <td className="px-6 py-4 text-slate-700">
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">{b.patient_phone}</td>
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
                 {new Date(b.booking_time).toLocaleString("vi-VN")}
               </td>
               <td className="px-6 py-4 text-slate-700">{b.service_name}</td>
-              <td className="px-6 py-4 text-slate-700">{b.doctor_name ?? "-"}</td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">{b.doctor_name ?? "-"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${badge(
                     b.booking_status
@@ -83,13 +83,13 @@ export function BookingTable({ bookings }: { bookings: Booking[] }) {
                   {translateStatus(b.booking_status)}
                 </span>
               </td>
-              <td className="px-6 py-4 text-slate-700">
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
                 <div className="flex items-center">
                    <CreditCard className="w-4 h-4 mr-1.5 text-slate-400" />
                    {translateStatus(b.payment_status ?? "unpaid")}
                 </div>
               </td>
-              <td className="px-6 py-4 text-right">
+              <td className="px-6 py-4 text-right whitespace-nowrap">
                 <button
                   onClick={() => router.push(`/admin/bookings/${b.booking_id}`)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm hover:shadow"
