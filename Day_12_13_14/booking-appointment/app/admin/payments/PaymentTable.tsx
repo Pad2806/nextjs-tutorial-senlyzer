@@ -23,16 +23,16 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
 
   return (
     <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full min-w-[1200px]">
         <thead className="bg-blue-50 border-b border-blue-200 text-xs text-blue-700 uppercase tracking-wider">
           <tr>
-            <th className="px-6 py-4 text-left font-semibold">Bệnh nhân</th>
-            <th className="px-6 py-4 text-left font-semibold">SĐT</th>
-            <th className="px-6 py-4 text-left font-semibold">Phòng khám</th>
-            <th className="px-6 py-4 text-left font-semibold">Dịch vụ</th>
-            <th className="px-6 py-4 text-left font-semibold">Số tiền</th>
-            <th className="px-6 py-4 text-left font-semibold">Phương thức</th>
-            <th className="px-6 py-4 text-left font-semibold">Trạng thái</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[200px]">Bệnh nhân</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">SĐT</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[200px]">Phòng khám</th>
+            <th className="px-6 py-4 text-left font-semibold min-w-[150px]">Dịch vụ</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Số tiền</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Phương thức</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Trạng thái</th>
           </tr>
         </thead>
 
@@ -53,17 +53,17 @@ export function PaymentTable({ payments }: { payments: Payment[] }) {
                   {p.patient_email ?? "—"}
                 </div>
               </td>
-              <td className="px-6 py-4 text-slate-700">{p.patient_phone}</td>
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">{p.patient_phone}</td>
               <td className="px-6 py-4 text-slate-700">{p.clinic_name}</td>
               <td className="px-6 py-4 text-slate-700">{p.service_name}</td>
-              <td className="px-6 py-4 font-bold text-blue-700">
+              <td className="px-6 py-4 font-bold text-blue-700 whitespace-nowrap">
                 {p.amount?.toLocaleString()} đ
               </td>
-              <td className="px-6 py-4 text-slate-700">
+              <td className="px-6 py-4 text-slate-700 whitespace-nowrap">
                 <CreditCard className="inline w-4 h-4 mr-1 text-slate-400" />
                 {p.payment_method ?? "-"}
               </td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-4 whitespace-nowrap">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${badge(
                     p.payment_status

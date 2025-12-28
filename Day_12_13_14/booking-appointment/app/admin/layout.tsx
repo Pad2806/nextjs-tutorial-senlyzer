@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="h-screen flex bg-slate-100 overflow-hidden">
-      <aside className="w-44 bg-white border-r h-full flex-shrink-0 px-4 py-6 overflow-y-auto">
+      <aside className="w-50 bg-white border-r h-full flex-shrink-0 px-4 py-6 overflow-y-auto">
         <div className="text-blue-700 font-bold text-lg mb-6">Clinic Admin</div>
 
         <nav className="space-y-1">
