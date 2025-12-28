@@ -34,7 +34,7 @@ export function BookingTable({ bookings }: { bookings: Booking[] }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-x-auto border border-slate-100">
-      <table className="w-full">
+      <table className="w-full min-w-[1000px]">
         <thead className="bg-slate-50 border-b text-xs text-slate-500 uppercase tracking-wider">
           <tr>
             <th className="px-6 py-4 text-left font-semibold">Bệnh nhân</th>
