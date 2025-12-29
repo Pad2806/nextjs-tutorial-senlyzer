@@ -286,7 +286,7 @@ export default function ChatClient() {
               }`}
             >
               <div
-                className={`px-4 py-2 rounded-xl text-sm whitespace-pre-line max-w-[80%]
+                className={`px-4 py-2 rounded-xl text-sm max-w-[80%]
                 ${
                   m.from === "user"
                     ? "bg-blue-600 text-white"
@@ -343,7 +343,7 @@ export default function ChatClient() {
                     </button>
                   </div>
                 ) : (
-                  m.text
+                  <div className="whitespace-pre-line">{m.text}</div>
                 )}
               </div>
             </div>
