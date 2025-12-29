@@ -22,7 +22,8 @@ type ChatStep =
   | "clinic"
   | "service"
   | "date"
-  | "time";
+  | "time"
+  | "confirm";
 
 interface BookingFormState {
   clinic?: string;
@@ -38,6 +39,12 @@ interface BookingFormState {
 interface Message {
   from: "bot" | "user";
   text: string;
+  type?: "text" | "confirmation";
+  bookingData?: BookingFormState & {
+    clinicName: string;
+    serviceName: string;
+    amount: number;
+  };
 }
 
 export default function ChatClient() {
@@ -230,16 +237,32 @@ export default function ChatClient() {
         }
 
         const bookingTime = `${tempDay} ${slots[idx].time}:00`;
-        pushBot("Đang lưu lịch khám...");
+        const clinicName = clinics.find((c) => c.id === form.clinic)?.name || "";
+        const serviceName = services.find((s) => s.id === form.service)?.name || "";
 
-        const bookingId = await createBookingViaApi(bookingTime);
+        setForm((prev) => ({ ...prev, time: bookingTime }));
+        setStep("confirm");
 
-        if (bookingId) {
-          pushBot("Đặt lịch thành công!");
-          router.push(`/payment?bookingId=${bookingId}`);
-        } else {
-          pushBot("Đặt lịch thất bại.");
-        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            from: "user",
+            text: input,
+          },
+          {
+            from: "bot",
+            text: "Vui lòng xác nhận thông tin đặt lịch:",
+            type: "confirmation",
+            bookingData: {
+              ...form,
+              time: bookingTime,
+              clinicName,
+              serviceName,
+              amount: 2000,
+            },
+          },
+        ]);
+
         break;
       }
     }
@@ -270,7 +293,58 @@ export default function ChatClient() {
                     : "bg-gray-100 text-slate-800"
                 }`}
               >
-                {m.text}
+                {m.type === "confirmation" && m.bookingData ? (
+                  <div className="space-y-3 min-w-[250px]">
+                    <p className="font-semibold text-base border-b border-blue-200 pb-2 mb-2">
+                      Thông tin đặt lịch
+                    </p>
+                    <div className="space-y-1 text-sm">
+                      <p>
+                        <span className="font-medium">Bệnh nhân:</span>{" "}
+                        {m.bookingData.name}
+                      </p>
+                      <p>
+                        <span className="font-medium">SĐT:</span>{" "}
+                        {m.bookingData.phone}
+                      </p>
+                      <p>
+                        <span className="font-medium">Phòng khám:</span>{" "}
+                        {m.bookingData.clinicName}
+                      </p>
+                      <p>
+                        <span className="font-medium">Dịch vụ:</span>{" "}
+                        {m.bookingData.serviceName}
+                      </p>
+                      <p>
+                        <span className="font-medium">Thời gian:</span>{" "}
+                        {new Date(m.bookingData.time).toLocaleString("vi-VN")}
+                      </p>
+                      <p className="text-blue-700 font-bold pt-2 border-t border-slate-200 mt-2">
+                        Tiền cọc: {m.bookingData.amount.toLocaleString()} đ
+                      </p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const loadingMsgId = Date.now();
+                        pushBot("Đang xử lý...");
+                        const bookingId = await createBookingViaApi(
+                          m.bookingData!.time
+                        );
+                        if (bookingId) {
+                          pushBot("Đặt lịch thành công!");
+                          router.push(`/payment?bookingId=${bookingId}`);
+                        } else {
+                          pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
+                        }
+                      }}
+                      className="w-full py-2 bg-white text-blue-600 font-bold rounded-lg border border-blue-200 hover:bg-blue-50 transition"
+                    >
+                      Thanh toán
+                    </button>
+                  </div>
+                ) : (
+                  m.text
+                )}
               </div>
             </div>
           ))}
