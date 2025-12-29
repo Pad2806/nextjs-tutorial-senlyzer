@@ -96,7 +96,17 @@ export default function BookingForm() {
     )
       .then((r) => r.json())
       .then((d: TimeSlot[]) => {
-        setTimeSlots(d);
+        let slots = d;
+        const now = new Date();
+        const isToday =
+          form.appointmentDate === now.toLocaleDateString("en-CA");
+
+        if (isToday) {
+          const currentTime = now.toTimeString().slice(0, 5);
+          slots = slots.filter((s) => s.time > currentTime);
+        }
+
+        setTimeSlots(slots);
         setHasCheckedSlots(true);
       });
   }, [form.clinic, form.service, form.appointmentDate]);
@@ -238,12 +248,6 @@ export default function BookingForm() {
               <h3 className="text-xl font-bold text-slate-900">
                 Xác nhận thông tin
               </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-full transition"
-              >
-                <X className="w-5 h-5 text-slate-500" />
-              </button>
             </div>
 
             <div className="space-y-4 text-sm">
