@@ -307,7 +307,7 @@ export default function ChatClient() {
                     : "bg-gray-100 text-slate-800"
                 }`}
               >
-                {m.type === "confirmation" && m.bookingData ? (
+                {/* {m.type === "confirmation" && m.bookingData ? (
                   <div className="space-y-3 min-w-[250px]">
                     <p className="font-semibold text-base border-b border-blue-200 pb-2 mb-2">
                       Thông tin đặt lịch
@@ -358,7 +358,71 @@ export default function ChatClient() {
                   </div>
                 ) : (
                   <div className="whitespace-pre-line">{m.text}</div>
-                )}
+                )} */}
+                {m.type === "confirmation" && m.bookingData ? (
+  <div className="w-[300px] rounded-xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
+    {/* Header */}
+    <div className="font-semibold text-slate-800 text-sm border-b pb-2">
+      Thông tin đặt lịch
+    </div>
+
+    {/* Info */}
+    <div className="grid grid-cols-3 gap-y-1.5 text-sm">
+      <span className="text-slate-500">Bệnh nhân</span>
+      <span className="col-span-2 font-medium text-slate-800">
+        {m.bookingData.name}
+      </span>
+
+      <span className="text-slate-500">SĐT</span>
+      <span className="col-span-2 font-medium text-slate-800">
+        {m.bookingData.phone}
+      </span>
+
+      <span className="text-slate-500">Phòng khám</span>
+      <span className="col-span-2 font-medium text-slate-800">
+        {m.bookingData.clinicName}
+      </span>
+
+      <span className="text-slate-500">Dịch vụ</span>
+      <span className="col-span-2 font-medium text-slate-800">
+        {m.bookingData.serviceName}
+      </span>
+
+      <span className="text-slate-500">Thời gian</span>
+      <span className="col-span-2 font-semibold text-blue-600">
+        {new Date(m.bookingData.time).toLocaleString("vi-VN")}
+      </span>
+    </div>
+
+    {/* Amount */}
+    <div className="flex justify-between items-center rounded-lg bg-blue-50 px-3 py-2">
+      <span className="text-sm text-slate-600">Tiền cọc</span>
+      <span className="font-bold text-blue-700">
+        {m.bookingData.amount.toLocaleString()} đ
+      </span>
+    </div>
+
+    {/* Button */}
+    <button
+      onClick={async () => {
+        pushBot("Đang xử lý...");
+        const bookingId = await createBookingViaApi(m.bookingData!.time);
+        if (bookingId) {
+          pushBot("Đặt lịch thành công!");
+          router.push(`/payment?bookingId=${bookingId}`);
+        } else {
+          pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
+        }
+      }}
+      className="w-full rounded-lg bg-blue-600 py-2 text-white text-sm font-semibold hover:bg-blue-700 transition"
+    >
+      Thanh toán
+    </button>
+  </div>
+) : (
+  <div className="whitespace-pre-line">{m.text}</div>
+)}
+
               </div>
             </div>
           ))}
