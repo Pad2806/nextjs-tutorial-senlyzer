@@ -12,6 +12,7 @@ import {
   Users,
   Calendar,
   FileText,
+  X,
 } from "lucide-react";
 
 interface Option {
@@ -60,11 +61,12 @@ type BookingResponse = {
 };
 
 export default function BookingForm() {
-  const { form, update, submit, errors, isSubmitting } = useBookingForm();
+  const { form, update, submit, errors, isSubmitting, validateForm } = useBookingForm();
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [hasCheckedSlots, setHasCheckedSlots] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -219,12 +221,89 @@ export default function BookingForm() {
       )}
 
       <button
-        onClick={submit}
+        onClick={() => {
+          if (validateForm()) setShowModal(true);
+        }}
         disabled={isSubmitting}
-        className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold disabled:bg-slate-400"
+        className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold disabled:bg-slate-400 hover:bg-blue-700 transition"
       >
-        {isSubmitting ? "Đang xử lý..." : "Xác nhận & thanh toán"}
+        Xác nhận
       </button>
+
+      {/* Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-slate-900">
+                Xác nhận thông tin
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-full transition"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <div className="bg-blue-50 p-4 rounded-xl space-y-2 text-blue-900">
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Bệnh nhân:</span>
+                  <span className="font-medium">{form.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">SĐT:</span>
+                  <span className="font-medium">{form.phone}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Phòng khám:</span>
+                  <span className="font-medium">
+                    {clinics.find((c) => c.id === form.clinic)?.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Dịch vụ:</span>
+                  <span className="font-medium">
+                    {services.find((s) => s.id === form.service)?.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Thời gian:</span>
+                  <span className="font-medium">
+                    {form.appointmentTime} - {form.appointmentDate}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-blue-200 rounded-xl bg-white shadow-sm">
+                <span className="text-slate-600 font-medium">
+                  Tiền đặt cọc
+                </span>
+                <span className="text-lg font-bold text-blue-600">
+                  2.000 đ
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 py-3 rounded-xl border border-slate-200 font-medium text-slate-600 hover:bg-slate-50 transition"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={submit}
+                disabled={isSubmitting}
+                className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:bg-slate-400 transition"
+              >
+                {isSubmitting ? "Đang xử lý..." : "Thanh toán"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

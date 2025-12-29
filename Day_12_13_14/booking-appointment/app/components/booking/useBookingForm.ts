@@ -109,5 +109,6 @@ export function useBookingForm() {
     errors,
     isSubmitting,
     status,
+    validateForm,
   };
 }
