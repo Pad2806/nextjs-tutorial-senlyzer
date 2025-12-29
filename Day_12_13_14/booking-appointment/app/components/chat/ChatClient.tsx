@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/app/lib/supabase/client";
 import { Clinic } from "@/app/lib/supabase/types/clinic";
 import { Service } from "@/app/lib/supabase/types/service";
@@ -270,6 +270,20 @@ export default function ChatClient() {
     setInput("");
   };
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+
+
+
+
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-2xl w-full h-[700px] bg-white rounded-3xl shadow flex flex-col">
@@ -286,7 +300,7 @@ export default function ChatClient() {
               }`}
             >
               <div
-                className={`px-4 py-2 rounded-xl text-sm max-w-[80%]
+                className={`px-4 py-2 rounded-xl text-sm max-w-[80%] break-words
                 ${
                   m.from === "user"
                     ? "bg-blue-600 text-white"
@@ -348,6 +362,7 @@ export default function ChatClient() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         {showDatePicker && (
