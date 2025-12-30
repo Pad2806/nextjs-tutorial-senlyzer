@@ -78,22 +78,50 @@ export const authOptions: NextAuthOptions = {
       const providerId = profile?.sub;
       if (!providerId) return false;
 
-      const { error } = await supabaseAdmin.from("users").upsert(
-        {
-          name: user.name,
-          email: user.email,
-          provider: "google",
-          provider_id: providerId,
-          avatar_url: user.image,
-          is_active: true,
-        },
-        { onConflict: "email" }
-      );
+      // Kiểm tra user có tồn tại chưa
+      const { data: existingUser } = await supabaseAdmin
+        .from("users")
+        .select("id")
+        .eq("email", user.email)
+        .single();
 
-      if (error) {
-        console.error("Supabase signIn error:", error);
-        return false;
+      if (existingUser) {
+        // Update user hiện có
+        const { error: updateError } = await supabaseAdmin
+          .from("users")
+          .update({
+            name: user.name,
+            provider: "google",
+            provider_id: providerId,
+            avatar_url: user.image,
+            is_active: true,
+          })
+          .eq("email", user.email);
+
+        if (updateError) {
+          console.error("Supabase update error:", updateError);
+          return false;
+        }
+      } else {
+        // Tạo user mới
+        const { error: insertError } = await supabaseAdmin
+          .from("users")
+          .insert({
+            name: user.name,
+            email: user.email,
+            provider: "google",
+            provider_id: providerId,
+            avatar_url: user.image,
+            is_active: true,
+          });
+
+        if (insertError) {
+          console.error("Supabase insert error:", insertError);
+          return false;
+        }
       }
+
+
 
       return true;
     },
