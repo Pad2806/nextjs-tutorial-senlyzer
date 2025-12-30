@@ -275,7 +275,8 @@ export default function BookingForm() {
                 <div className="flex justify-between">
                   <span className="text-blue-600">Thời gian:</span>
                   <span className="font-medium">
-                    {form.appointmentTime} - {form.appointmentDate}
+                    {form.appointmentTime} -{" "}
+                    {form.appointmentDate?.split("-").reverse().join("/")}
                   </span>
                 </div>
               </div>
