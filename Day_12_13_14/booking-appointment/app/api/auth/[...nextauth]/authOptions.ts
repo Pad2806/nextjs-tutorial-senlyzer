@@ -87,7 +87,7 @@ export const authOptions: NextAuthOptions = {
           avatar_url: user.image,
           is_active: true,
         },
-        { onConflict: "provider,provider_id" }
+        { onConflict: "email" }
       );
 
       if (error) {
