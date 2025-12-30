@@ -3,19 +3,48 @@ import { supabaseAdmin } from "@/app/lib/supabase/admin";
 
 export async function GET() {
     try {
+        // Sử dụng email cố định để test update
         const dummyUser = {
-            email: "debug_test_" + Date.now() + "@example.com",
-            name: "Debug User",
+            email: "debug_fix_test@example.com",
+            name: "Debug User Fixed",
             provider: "google",
-            provider_id: "debug_123",
+            provider_id: "debug_123_fixed",
             avatar_url: "https://example.com/avatar.jpg",
             is_active: true,
         };
 
-        const { data, error } = await supabaseAdmin
+        // FIX: Không dùng upsert nữa vì DB thiếu unique constraint
+        // 1. Check xem có user chưa
+        const { data: existingUser } = await supabaseAdmin
             .from("users")
-            .upsert(dummyUser, { onConflict: "email" })
-            .select();
+            .select("id")
+            .eq("email", dummyUser.email)
+            .single();
+
+        let error;
+        let action;
+
+        if (existingUser) {
+            // 2. Nếu có rồi thì Update
+            action = "Update";
+            const res = await supabaseAdmin
+                .from("users")
+                .update({
+                    name: dummyUser.name,
+                    provider: dummyUser.provider,
+                    avatar_url: dummyUser.avatar_url,
+                    is_active: true,
+                })
+                .eq("email", dummyUser.email);
+            error = res.error;
+        } else {
+            // 3. Nếu chưa thì Insert
+            action = "Insert";
+            const res = await supabaseAdmin
+                .from("users")
+                .insert(dummyUser);
+            error = res.error;
+        }
 
         if (error) {
             return NextResponse.json({
@@ -27,8 +56,7 @@ export async function GET() {
 
         return NextResponse.json({
             status: "Success",
-            message: "Users table has correct columns. Upsert worked.",
-            data,
+            message: `Đã xử lý thành công (${action}) - Logic mới đã hoạt động!`,
         });
     } catch (err: any) {
         return NextResponse.json({
