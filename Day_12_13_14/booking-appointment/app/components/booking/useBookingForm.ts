@@ -60,8 +60,8 @@ export function useBookingForm() {
 
     if (!form.gender) e.gender = "Chọn giới tính";
 
-    if (!form.dob) {
-      e.dob = "Vui lòng chọn ngày sinh";
+    if (!form.age || Number(form.age) <= 0) {
+      e.age = "Vui lòng nhập tuổi hợp lệ";
     }
 
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -129,8 +129,7 @@ export function useBookingForm() {
           name: form.name,
           phone: form.phone,
           gender: form.gender,
-          age: form.age ? Number(form.age) : form.dob ? new Date().getFullYear() - new Date(form.dob).getFullYear() : 0,
-          // Simple age calcluation, can be improved
+          age: Number(form.age),
           symptoms: form.symptoms,
           clinic: form.clinic,
           service: form.service,

@@ -363,18 +363,21 @@ export default function BookingForm() {
             {/* Left Column */}
             <div className="space-y-4">
                 {/* Name + Gender Row */}
-                <div className="space-y-1">
-                    <label className="text-sm font-medium">Họ và tên *</label>
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                           <input 
-                              placeholder="Họ và tên"
-                              value={form.name}
-                              onChange={(e) => update("name", e.target.value)}
-                              className={`w-full py-3 px-4 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-100 outline-none`}
-                            />
-                        </div>
-                        <div className="flex items-center gap-4 px-2">
+                <div className="flex gap-4 items-start">
+                    <div className="flex-1">
+                       <label className="text-sm font-medium mb-1 block">Họ và tên *</label>
+                       <input 
+                           placeholder="Họ và tên"
+                           value={form.name}
+                           onChange={(e) => update("name", e.target.value)}
+                           className={`w-full py-3 px-4 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-100 outline-none`}
+                        />
+                        {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+                    </div>
+                    
+                    <div>
+                         <label className="text-sm font-medium mb-1 block">Giới tính *</label>
+                         <div className="flex items-center gap-4 px-2 h-[50px]">
                              <label className="flex items-center gap-2 cursor-pointer">
                                 <input 
                                     type="radio" 
@@ -398,9 +401,8 @@ export default function BookingForm() {
                                 <span className="text-sm">Nữ</span>
                              </label>
                         </div>
+                        {errors.gender && <p className="text-sm text-red-600 mt-1">{errors.gender}</p>}
                     </div>
-                    {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
-                    {errors.gender && <p className="text-sm text-red-600">{errors.gender}</p>}
                 </div>
 
                 <Input
@@ -416,16 +418,13 @@ export default function BookingForm() {
             {/* Right Column */}
             <div className="space-y-4">
                 <Input
-                    label="Ngày tháng năm sinh *"
-                    type="date"
-                    // Use dob if available, or visual placeholder
-                    value={form.dob}
-                    onChange={(v) => update("dob", v)}
-                    // Assuming we are mapping DOB to Age logic internally or just passing DOB
+                    label="Tuổi *"
+                    type="number"
+                    placeholder="Nhập tuổi"
+                    value={form.age}
+                    error={errors.age}
+                    onChange={(v) => update("age", v)}
                 />
-                 {/* Fallback Age input hidden or if dob missing? For now let's rely on DOB */}
-                 
-                 \
             </div>
         </div>
         
