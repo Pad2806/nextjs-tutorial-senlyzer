@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useBookingForm } from "./useBookingForm";
 import {
   User,
@@ -72,6 +72,7 @@ export default function BookingForm() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const minDate = today.toLocaleDateString("en-CA");
+  const datePickerRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     Promise.all([
@@ -262,11 +263,12 @@ export default function BookingForm() {
                         </button>
                     )
                 })}
-                 <div className="relative group">
+                <div className="relative">
                     <input 
+                        ref={datePickerRef}
                         type="date" 
                         min={minDate}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
+                        className="sr-only"
                         onChange={(e) => {
                              if(e.target.value) {
                                  update("appointmentDate", e.target.value);
@@ -275,10 +277,21 @@ export default function BookingForm() {
                              }
                         }}
                     />
-                    <button className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full relative z-10 ${
+                    <button 
+                        onClick={() => {
+                            if (datePickerRef.current) {
+                                try {
+                                    datePickerRef.current.showPicker();
+                                } catch (e) {
+                                    // Fallback for older browsers
+                                    datePickerRef.current.click();
+                                }
+                            }
+                        }}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
                         selectedTab === "other"
                         ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
-                        : "bg-gray-50 text-slate-600 border-slate-100 group-hover:border-emerald-200"
+                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
                     }`}>
                         {selectedTab === "other" && form.appointmentDate ? (
                              <>
