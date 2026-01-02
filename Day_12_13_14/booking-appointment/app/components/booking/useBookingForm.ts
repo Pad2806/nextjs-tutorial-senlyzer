@@ -90,13 +90,16 @@ export function useBookingForm() {
         }),
       });
 
-      if (!res.ok) throw new Error("Booking failed");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Booking failed");
+      }
 
       const data: { bookingId: string } = await res.json();
       router.push(`/payment?bookingId=${data.bookingId}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Có lỗi xảy ra");
+      alert(err.message || "Có lỗi xảy ra");
     } finally {
       setIsSubmitting(false);
     }

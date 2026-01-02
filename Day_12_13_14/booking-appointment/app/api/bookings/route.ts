@@ -11,6 +11,28 @@ export async function POST(req: Request) {
 
   const body = await req.json();
 
+  // Validate duplicate booking
+  const bookingTimeStr = String(body.booking_time);
+  const datePart = bookingTimeStr.split("T")[0]; // YYYY-MM-DD
+
+  const { data: existingBooking } = await supabaseAdmin
+    .from("bookings")
+    .select("id")
+    .eq("patient_phone", body.phone)
+    .gte("booking_time", `${datePart}T00:00:00`)
+    .lte("booking_time", `${datePart}T23:59:59`)
+    .neq("status", "completed")
+    .neq("status", "cancelled")
+    .neq("status", "failed") // Added failed just in case
+    .maybeSingle();
+
+  if (existingBooking) {
+    return Response.json(
+      { error: "Số điện thoại này đã có lịch đặt chưa khám trong ngày hôm nay." },
+      { status: 400 }
+    );
+  }
+
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from("bookings")
     .insert({
