@@ -13,9 +13,9 @@ export async function GET(req: Request) {
 
         // Select * to avoid column name errors (e.g. name vs full_name)
         // We still join correctly
-        const { data: doctors, error } = await supabaseAdmin
+        const { data, error } = await supabaseAdmin
             .from("doctors")
-            .select("*, doctor_services!inner(service_id)")
+            .select("*, users!inner(name), doctor_services!inner(service_id)")
             .eq("clinic_id", clinic_id)
             .eq("is_available", true)
             .eq("doctor_services.service_id", service_id);
@@ -24,6 +24,11 @@ export async function GET(req: Request) {
             console.error("Supabase Error fetching doctors:", error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
+
+        const doctors = data?.map((doc: any) => ({
+            ...doc,
+            name: doc.users?.name || "Bác sĩ",
+        }));
 
         return NextResponse.json(doctors ?? []);
     } catch (e) {
