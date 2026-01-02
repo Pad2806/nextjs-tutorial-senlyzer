@@ -93,11 +93,12 @@ export default function BookingForm() {
     fetch(`/api/doctors?clinic_id=${form.clinic}&service_id=${form.service}`)
         .then((r) => r.json())
         .then((data) => {
+            console.log("Fetched doctors:", data); // DEBUG
             if (Array.isArray(data)) {
                 // Map to ensure name property exists (handle name vs full_name)
                 const mappedDoctors = data.map((d: any) => ({
                     id: d.id,
-                    name: d.name || d.full_name || d.fullName || "Bác sĩ",
+                    name: d.full_name || d.fullName || d.name || "Bác sĩ",
                 }));
                 setDoctors(mappedDoctors);
             } else {
