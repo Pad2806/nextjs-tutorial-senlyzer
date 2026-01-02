@@ -13,6 +13,9 @@ export interface BookingFormState {
   symptoms?: string;
   appointmentDate?: string;
   appointmentTime?: string;
+  email?: string;
+  doctor?: string;
+  dob?: string;
 }
 
 export function useBookingForm() {
@@ -28,6 +31,9 @@ export function useBookingForm() {
     service: "",
     appointmentDate: "",
     appointmentTime: "",
+    email: "",
+    doctor: "",
+    dob: "",
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormState>>({});
@@ -45,17 +51,23 @@ export function useBookingForm() {
     const e: Partial<BookingFormState> = {};
 
     if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
+
     if (!form.phone.trim()) {
       e.phone = "Vui lòng nhập số điện thoại";
     } else if (!/^\d{10}$/.test(form.phone.trim())) {
       e.phone = "Số điện thoại phải có 10 chữ số";
     }
+
     if (!form.gender) e.gender = "Chọn giới tính";
-    if (!form.age) {
-      e.age = "Nhập tuổi";
-    } else if (Number(form.age) <= 0) {
-      e.age = "Tuổi không hợp lệ";
+
+    if (!form.dob) {
+      e.dob = "Vui lòng chọn ngày sinh";
     }
+
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      e.email = "Email không hợp lệ";
+    }
+
     if (!form.clinic) e.clinic = "Chọn phòng khám";
     if (!form.service) e.service = "Chọn dịch vụ";
     if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
@@ -117,7 +129,8 @@ export function useBookingForm() {
           name: form.name,
           phone: form.phone,
           gender: form.gender,
-          age: Number(form.age),
+          age: form.age ? Number(form.age) : form.dob ? new Date().getFullYear() - new Date(form.dob).getFullYear() : 0,
+          // Simple age calcluation, can be improved
           symptoms: form.symptoms,
           clinic: form.clinic,
           service: form.service,
