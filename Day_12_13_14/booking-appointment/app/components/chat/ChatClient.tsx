@@ -236,6 +236,30 @@ export default function ChatClient() {
           break;
         }
 
+        try {
+          const res = await fetch("/api/bookings/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              phone: form.phone,
+              appointmentDate: tempDay,
+            }),
+          });
+
+          if (!res.ok) {
+            const data = await res.json();
+            pushBot(data.error || "Số điện thoại này đã có lịch hẹn trong ngày.");
+            pushBot("Vui lòng chọn ngày khác:");
+            setStep("date");
+            setShowDatePicker(true);
+            break;
+          }
+        } catch (error) {
+          console.error("Validation error:", error);
+          pushBot("Có lỗi xảy ra khi kiểm tra thông tin. Vui lòng thử lại.");
+          break;
+        }
+
         const bookingTime = `${tempDay} ${slots[idx].time}:00`;
         const clinicName = clinics.find((c) => c.id === form.clinic)?.name || "";
         const serviceName = services.find((s) => s.id === form.service)?.name || "";

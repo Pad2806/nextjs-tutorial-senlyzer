@@ -94,10 +94,19 @@ export default function BookingForm() {
         .then((r) => r.json())
         .then((data) => {
             if (Array.isArray(data)) {
-                setDoctors(data);
+                // Map to ensure name property exists (handle name vs full_name)
+                const mappedDoctors = data.map((d: any) => ({
+                    id: d.id,
+                    name: d.name || d.full_name || d.fullName || "Bác sĩ",
+                }));
+                setDoctors(mappedDoctors);
             } else {
                 setDoctors([]);
             }
+        })
+        .catch(err => {
+            console.error("Failed to load doctors", err);
+            setDoctors([]);
         });
   }, [form.clinic, form.service]);
 
@@ -209,22 +218,26 @@ export default function BookingForm() {
           </div>
 
           {/* Right Column: Time Selection */}
-          <div className="space-y-4">
+          <div className="space-y-4 relative">
              <label className="text-sm font-medium block text-slate-900">Thời gian khám *</label>
              
+             {/* Disable Overlay if Clinic/Service not selected */}
+             {(!form.clinic || !form.service) && (
+                <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-xl border border-dashed border-slate-300">
+                    <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded shadow-sm border">
+                        Vui lòng chọn Phòng khám & Chuyên khoa trước
+                    </span>
+                </div>
+             )}
+
              {/* Custom Date Picker Tabs */}
-             <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+             <div className={`flex gap-4 mb-4 overflow-x-auto pb-2 ${(!form.clinic || !form.service) ? 'opacity-50 pointer-events-none' : ''}`}>
                 {[0, 1, 2].map(offset => {
                     const d = new Date();
                     d.setDate(d.getDate() + offset);
                     const dateStr = d.toLocaleDateString("en-CA"); // YYYY-MM-DD
                     const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}`;
                     
-                    // Day name logic: Today, Tomorrow, else Weekday
-                    let dayLabel = "";
-                    if (offset === 0) dayLabel = "Hôm nay"; // Should we stick to Weekday? User image shows "Thứ 7", "Chủ nhật".
-                    // Actually image shows "03/01 Thứ 7", "04/01 Chủ nhật", "05/01 Thứ 2"
-                    // So let's show real weekday name
                     const weekdays = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
                     const realDayName = weekdays[d.getDay()];
 
@@ -249,11 +262,11 @@ export default function BookingForm() {
                         </button>
                     )
                 })}
-                 <div className="relative">
+                 <div className="relative group">
                     <input 
                         type="date" 
                         min={minDate}
-                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
                         onChange={(e) => {
                              if(e.target.value) {
                                  update("appointmentDate", e.target.value);
@@ -262,10 +275,10 @@ export default function BookingForm() {
                              }
                         }}
                     />
-                    <button className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
+                    <button className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full relative z-10 ${
                         selectedTab === "other"
                         ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
-                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
+                        : "bg-gray-50 text-slate-600 border-slate-100 group-hover:border-emerald-200"
                     }`}>
                         {selectedTab === "other" && form.appointmentDate ? (
                              <>
@@ -399,12 +412,7 @@ export default function BookingForm() {
                 />
                  {/* Fallback Age input hidden or if dob missing? For now let's rely on DOB */}
                  
-                 <Input
-                    label="Email"
-                    placeholder="Nhập email"
-                    value={form.email}
-                    onChange={(v) => update("email", v)}
-                 />
+                 \
             </div>
         </div>
         
