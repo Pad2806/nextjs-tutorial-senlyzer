@@ -65,8 +65,44 @@ export function useBookingForm() {
     return Object.keys(e).length === 0;
   }
 
-  async function submit() {
+  async function validateBookingAvailability(): Promise<boolean> {
+    if (!validateForm()) return false;
 
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/bookings/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: form.phone,
+          appointmentDate: form.appointmentDate,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        if (res.status === 400 && errorData.error) {
+          setErrors((prev) => ({ ...prev, phone: errorData.error }));
+          setTimeout(() => {
+            setErrors((prev) => ({ ...prev, phone: undefined }));
+          }, 5000);
+          return false;
+        }
+        throw new Error(errorData.error || "Validation failed");
+      }
+      return true;
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Có lỗi xảy ra khi kiểm tra");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function submit() {
+    // We can skip validateForm() here if we assume it was called before, 
+    // but keeping it is safer.
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -120,7 +156,7 @@ export function useBookingForm() {
     submit,
     errors,
     isSubmitting,
-    status,
     validateForm,
+    validateBookingAvailability,
   };
 }

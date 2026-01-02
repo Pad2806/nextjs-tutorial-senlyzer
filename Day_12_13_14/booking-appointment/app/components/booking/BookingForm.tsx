@@ -61,7 +61,7 @@ type BookingResponse = {
 };
 
 export default function BookingForm() {
-  const { form, update, submit, errors, isSubmitting, validateForm } = useBookingForm();
+  const { form, update, submit, errors, isSubmitting, validateBookingAvailability } = useBookingForm();
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -231,13 +231,14 @@ export default function BookingForm() {
       )}
 
       <button
-        onClick={() => {
-          if (validateForm()) setShowModal(true);
+        onClick={async () => {
+          const isValid = await validateBookingAvailability();
+          if (isValid) setShowModal(true);
         }}
         disabled={isSubmitting}
         className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold disabled:bg-slate-400 hover:bg-blue-700 transition"
       >
-        Xác nhận
+        {isSubmitting ? "Đang kiểm tra..." : "Xác nhận"}
       </button>
 
       {/* Confirmation Modal */}
