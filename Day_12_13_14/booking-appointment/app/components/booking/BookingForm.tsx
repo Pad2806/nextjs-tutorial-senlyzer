@@ -65,6 +65,7 @@ export default function BookingForm() {
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [doctors, setDoctors] = useState<Option[]>([]); // New state for doctors
   const [hasCheckedSlots, setHasCheckedSlots] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,23 @@ export default function BookingForm() {
       setLoading(false);
     });
   }, []);
+
+  // UseEffect to fetch doctors
+  useEffect(() => {
+    if (!form.clinic || !form.service) {
+        setDoctors([]);
+        return;
+    }
+    fetch(`/api/doctors?clinic_id=${form.clinic}&service_id=${form.service}`)
+        .then((r) => r.json())
+        .then((data) => {
+            if (Array.isArray(data)) {
+                setDoctors(data);
+            } else {
+                setDoctors([]);
+            }
+        });
+  }, [form.clinic, form.service]);
 
   useEffect(() => {
     if (!form.clinic || !form.service || !form.appointmentDate) {
@@ -110,6 +128,23 @@ export default function BookingForm() {
         setHasCheckedSlots(true);
       });
   }, [form.clinic, form.service, form.appointmentDate]);
+
+  // Helper to determine active date tab
+  const getSelectedDateTab = () => {
+    if (!form.appointmentDate) return null;
+    const selected = new Date(form.appointmentDate);
+    selected.setHours(0,0,0,0);
+    const t = new Date();
+    t.setHours(0,0,0,0);
+    
+    const diffTime = selected.getTime() - t.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    
+    if (diffDays >= 0 && diffDays <= 2) return diffDays; // 0, 1, 2
+    return "other";
+  };
+  
+  const selectedTab = getSelectedDateTab();
 
   if (loading) {
     return (
@@ -162,15 +197,15 @@ export default function BookingForm() {
 
             <Select
                 label="Bác sĩ"
-                value={form.doctor} // Using form.doctor
-                options={[{id: "any", name: "Chọn Bác sĩ muốn khám"}]} // Placeholder
+                value={form.doctor} 
+                options={[
+                    {id: "", name: "Chọn Bác sĩ muốn khám"},
+                    ...doctors
+                ]} 
                 onChange={(v) => update("doctor", v)}
+                disabled={doctors.length === 0}
             />
 
-             <div className="flex items-center gap-2 pt-2">
-                <input type="checkbox" id="foreigner" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                <label htmlFor="foreigner" className="text-sm text-slate-600">Đặt hẹn cho người nước ngoài</label>
-             </div>
           </div>
 
           {/* Right Column: Time Selection */}
@@ -178,17 +213,22 @@ export default function BookingForm() {
              <label className="text-sm font-medium block text-slate-900">Thời gian khám *</label>
              
              {/* Custom Date Picker Tabs */}
-             <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+             <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
                 {[0, 1, 2].map(offset => {
                     const d = new Date();
                     d.setDate(d.getDate() + offset);
-                    const dateStr = d.toLocaleDateString("en-CA");
-                    const displayStr = `${d.getDate()}/${d.getMonth()+1}`;
-                    const dayName = offset === 0 ? "Hôm nay" : offset === 1 ? "Ngày mai" : `Chủ nhật`; // Simplified
-                    // Real day name
-                    const realDayName = d.toLocaleDateString("vi-VN", {weekday: 'long'});
+                    const dateStr = d.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                    const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}`;
                     
-                    const isSelected = form.appointmentDate === dateStr;
+                    // Day name logic: Today, Tomorrow, else Weekday
+                    let dayLabel = "";
+                    if (offset === 0) dayLabel = "Hôm nay"; // Should we stick to Weekday? User image shows "Thứ 7", "Chủ nhật".
+                    // Actually image shows "03/01 Thứ 7", "04/01 Chủ nhật", "05/01 Thứ 2"
+                    // So let's show real weekday name
+                    const weekdays = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+                    const realDayName = weekdays[d.getDay()];
+
+                    const isSelected = selectedTab === offset;
                     
                     return (
                         <button 
@@ -198,12 +238,14 @@ export default function BookingForm() {
                                 update("appointmentTime", "");
                                 setTimeSlots([]);
                             }}
-                            className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg border text-sm min-w-[80px] transition ${
-                                isSelected ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
+                            className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] ${
+                                isSelected 
+                                ? "bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105" 
+                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200 hover:bg-white"
                             }`}
                         >
-                            <span className="font-bold">{displayStr}</span>
-                            <span className="text-xs opacity-80">{realDayName}</span>
+                            <span className="text-lg font-bold">{displayDate}</span>
+                            <span className="text-xs font-medium opacity-90">{realDayName}</span>
                         </button>
                     )
                 })}
@@ -211,20 +253,38 @@ export default function BookingForm() {
                     <input 
                         type="date" 
                         min={minDate}
-                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
                         onChange={(e) => {
-                             update("appointmentDate", e.target.value);
-                             update("appointmentTime", "");
-                             setTimeSlots([]);
+                             if(e.target.value) {
+                                 update("appointmentDate", e.target.value);
+                                 update("appointmentTime", "");
+                                 setTimeSlots([]);
+                             }
                         }}
                     />
-                    <button className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg border text-sm min-w-[80px] h-full ${
-                        form.appointmentDate && new Date(form.appointmentDate) > new Date(new Date().setDate(new Date().getDate() + 2)) 
-                        ? "bg-blue-600 text-white border-blue-600" 
-                        : "bg-gray-50 text-slate-600 border-slate-200"
+                    <button className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
+                        selectedTab === "other"
+                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
+                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
                     }`}>
-                        <Calendar className="w-4 h-4 mb-1"/>
-                        <span className="text-xs">Ngày khác</span>
+                        {selectedTab === "other" && form.appointmentDate ? (
+                             <>
+                                <span className="text-lg font-bold">
+                                    {form.appointmentDate.split('-').reverse().slice(0,2).join('/')}
+                                </span>
+                                <span className="text-xs font-medium flex items-center gap-1">
+                                    Ngày khác <Calendar className="w-3 h-3" />
+                                </span>
+                             </>
+                        ) : (
+                             <>
+                                <span className="text-lg font-bold">--/--</span>
+                                <span className="text-xs font-medium flex items-center gap-1">
+                                    Ngày khác <Calendar className="w-3 h-3" />
+                                </span>
+                             </>
+                        )}
+                        
                     </button>
                  </div>
              </div>
@@ -325,10 +385,6 @@ export default function BookingForm() {
                     onChange={(v) => update("phone", v)}
                 />
 
-                 {/* Note under phone */}
-                 <p className="text-xs text-slate-500">
-                    *Lưu ý: Hệ thống chỉ gửi SMS được cho Thuê bao nội địa...
-                 </p>
             </div>
 
             {/* Right Column */}
@@ -378,7 +434,7 @@ export default function BookingForm() {
             disabled={isSubmitting}
             className="px-8 py-3 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl disabled:bg-slate-400 min-w-[200px]"
         >
-            {isSubmitting ? "Đang xử lý..." : "Gửi thông tin"}
+            {isSubmitting ? "Đang xử lý..." : "Xác nhận"}
         </button>
       </div>
 
