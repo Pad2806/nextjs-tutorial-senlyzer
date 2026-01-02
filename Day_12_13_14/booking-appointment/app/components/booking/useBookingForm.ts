@@ -92,6 +92,15 @@ export function useBookingForm() {
 
       if (!res.ok) {
         const errorData = await res.json();
+        // Check if it's our specific duplicate booking error
+        if (res.status === 400 && errorData.error?.includes("Số điện thoại")) {
+          setErrors((prev) => ({ ...prev, phone: errorData.error }));
+          // Start timer to clear error after 5 seconds
+          setTimeout(() => {
+            setErrors((prev) => ({ ...prev, phone: undefined }));
+          }, 5000);
+          return; // Stop execution, don't throw
+        }
         throw new Error(errorData.error || "Booking failed");
       }
 
