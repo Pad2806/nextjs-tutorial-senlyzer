@@ -23,7 +23,8 @@ type ChatStep =
   | "service"
   | "date"
   | "time"
-  | "confirm";
+  | "confirm"
+  | "resolve_duplicate_phone";
 
 interface BookingFormState {
   clinic?: string;
@@ -229,6 +230,19 @@ export default function ChatClient() {
         break;
       }
 
+      case "resolve_duplicate_phone": {
+        if (!/^\d{10}$/.test(input)) {
+          pushBot("Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số.");
+          break;
+        }
+        setForm({ ...form, phone: input });
+        pushBot(`Đã cập nhật số điện thoại: ${input}`);
+        pushBot("Vui lòng chọn lại thời gian khám:");
+        setStep("date");
+        setShowDatePicker(true);
+        break;
+      }
+
       case "time": {
         const idx = Number(input) - 1;
         if (!slots[idx]) {
@@ -300,6 +314,10 @@ export default function ChatClient() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   // Helper logic for dates
   const getDayLabel = (offset: number) => {
     const d = new Date();
@@ -360,8 +378,9 @@ export default function ChatClient() {
           if (!res.ok) {
             const data = await res.json();
             pushBot(data.error || "Số điện thoại này đã có lịch hẹn trong ngày.");
-            pushBot("Vui lòng chọn ngày khác:");
-            setShowDatePicker(true); // Re-open
+            pushBot("Vui lòng nhập số điện thoại khác để tiếp tục:");
+            // Switch to a mode where we accept a new phone number
+            setStep("resolve_duplicate_phone" as ChatStep); 
             return;
           }
         } catch (error) {
