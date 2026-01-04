@@ -6,6 +6,7 @@ import { Clinic } from "@/app/lib/supabase/types/clinic";
 import { Service } from "@/app/lib/supabase/types/service";
 import { useRouter } from "next/navigation";
 import { generateSepayQR } from "@/app/lib/payment/sepayqr";
+import { X } from "lucide-react";
 
 type SlotStat = {
   time: string;
@@ -710,10 +711,22 @@ export default function ChatClient() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-[2rem] p-6 shadow-2xl max-w-sm w-full relative animate-in zoom-in-95 duration-200 border border-slate-100">
                 <button 
-                    onClick={() => setPaymentBookingId(null)}
+                    onClick={async () => {
+                        if (paymentBookingId) {
+                            await fetch(`/api/bookings/${paymentBookingId}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ status: 'expired' })
+                            });
+                        }
+                        setPaymentBookingId(null);
+                        setPaymentCreatedAt(null);
+                        pushBot("Bạn đã huỷ thanh toán. Vui lòng chọn lại thời gian khám nếu muốn đặt lại.");
+                        setStep("date");
+                        setShowDatePicker(true);
+                    }}
                     className="absolute right-4 top-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/></svg>
+                    <X size={20} />
                 </button>
 
                 <div className="text-center space-y-4 pt-2">

@@ -32,7 +32,7 @@ export async function GET(
   if (error || !booking) {
     return Response.json({ message: "NOT_FOUND" }, { status: 404 });
   }
- const amount = 2000;
+  const amount = 2000;
   if (
     booking.status === "pending" &&
     booking.created_at &&
@@ -57,4 +57,32 @@ export async function GET(
     amount,
     created_at: booking.created_at,
   });
+}
+
+
+export async function PATCH(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id: bookingId } = await context.params;
+  const { status } = await req.json();
+
+  if (!bookingId) {
+    return Response.json({ message: "MISSING_ID" }, { status: 400 });
+  }
+
+  if (status !== 'expired') {
+    return Response.json({ message: "INVALID_STATUS" }, { status: 400 });
+  }
+
+  const { error } = await supabaseAdmin
+    .from("bookings")
+    .update({ status: "expired" })
+    .eq("id", bookingId);
+
+  if (error) {
+    return Response.json({ message: "ERROR" }, { status: 500 });
+  }
+
+  return Response.json({ message: "OK" });
 }

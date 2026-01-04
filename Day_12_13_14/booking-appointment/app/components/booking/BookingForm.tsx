@@ -560,7 +560,20 @@ export default function BookingForm() {
                    /* Pending State */
                    <>
                         <button 
-                            onClick={() => setPaymentBookingId(null)}
+                            onClick={async () => {
+                                if (paymentBookingId) {
+                                    await fetch(`/api/bookings/${paymentBookingId}`, {
+                                        method: 'PATCH',
+                                        body: JSON.stringify({ status: 'expired' })
+                                    });
+                                }
+                                setPaymentBookingId(null);
+                                setPaymentStatus("pending");
+                                setPaymentCreatedAt(null);
+                                reset();
+                                setHasCheckedSlots(false);
+                                setTimeSlots([]);
+                            }}
                             className="absolute right-4 top-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition"
                         >
                             <X size={20} />
