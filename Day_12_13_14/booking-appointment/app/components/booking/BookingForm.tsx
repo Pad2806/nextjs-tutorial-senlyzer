@@ -424,7 +424,7 @@ export default function BookingForm() {
         
         <div className="mt-4">
              <TextArea
-                label="Lý do khám *"
+                label="Lý do khám"
                 value={form.symptoms}
                 error={errors.symptoms}
                 onChange={(v) => update("symptoms", v)}
