@@ -4,10 +4,10 @@ import AuthProvider from "@/app/provider/SessionProvider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Thiện Nhân Hospital - Đặt lịch khám bệnh",
-  description: "Hệ thống đặt lịch khám bệnh trực tuyến tại Thiện Nhân Hospital",
+  title: "Thiện Nhân Hospital",
+  description: "Đặt lịch khám bệnh trực tuyến",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon-new.png",
   },
 };
 
