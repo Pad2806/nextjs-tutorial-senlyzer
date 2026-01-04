@@ -130,7 +130,7 @@ export default function ChatClient() {
       case "service":
         setStep("date");
         setShowDatePicker(true);
-        pushBot("Vui lòng chọn ngày khám:");
+        // pushBot("Vui lòng chọn ngày khám:"); // Removed text prompt as UI appears
         break;
 
       default:
@@ -300,20 +300,106 @@ export default function ChatClient() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Helper logic for dates
+  const getDayLabel = (offset: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    const dateStr = d.toLocaleDateString("en-CA");
+    const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}`;
+    const weekdays = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+    return { dateStr, displayDate, label: weekdays[d.getDay()] };
+  };
+
+  const todayStr = new Date().toLocaleDateString("en-CA");
+  
+  // Effect to fetch slots whenever tempDay changes and we are in date/time selection mode
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (step === 'date' && tempDay && form.clinic && form.service) {
+        setSlots([]);
+        fetch(`/api/available-slots?clinic_id=${form.clinic}&service_id=${form.service}&date=${tempDay}`)
+            .then(r => r.json())
+            .then((data: SlotStat[]) => {
+                 let s = data;
+                 // If today, filter past times
+                 if (tempDay === new Date().toLocaleDateString("en-CA")) {
+                     const now = new Date();
+                     const currentTime = now.toTimeString().slice(0, 5);
+                     s = s.filter(slot => slot.time > currentTime);
+                 }
+                 setSlots(s);
+            })
+            .catch(err => console.error(err));
+    }
+  }, [tempDay, step, form.clinic, form.service]);
 
+  // When opening date picker, default to today
+  useEffect(() => {
+      if (showDatePicker && !tempDay) {
+          setTempDay(new Date().toLocaleDateString("en-CA"));
+      }
+  }, [showDatePicker]);
 
+  const handleTimeSelect = async (time: string) => {
+      setShowDatePicker(false);
+      // Manually trigger the flow as if user typed the time
+      setMessages(prev => [...prev, { from: "user", text: `Đặt lịch lúc ${time} ngày ${tempDay.split('-').reverse().join('/')}` }]);
+      
+      const fullTime = `${tempDay} ${time}:00`;
+      
+      // Validate
+       try {
+          const res = await fetch("/api/bookings/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              phone: form.phone,
+              appointmentDate: tempDay,
+            }),
+          });
 
+          if (!res.ok) {
+            const data = await res.json();
+            pushBot(data.error || "Số điện thoại này đã có lịch hẹn trong ngày.");
+            pushBot("Vui lòng chọn ngày khác:");
+            setShowDatePicker(true); // Re-open
+            return;
+          }
+        } catch (error) {
+          console.error("Validation error:", error);
+          pushBot("Có lỗi xảy ra khi kiểm tra thông tin. Vui lòng thử lại.");
+          return;
+        }
+
+        const clinicName = clinics.find((c) => c.id === form.clinic)?.name || "";
+        const serviceName = services.find((s) => s.id === form.service)?.name || "";
+        
+        setForm((prev) => ({ ...prev, time: fullTime }));
+        setStep("confirm");
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            from: "bot",
+            text: "Vui lòng xác nhận thông tin đặt lịch:",
+            type: "confirmation",
+            bookingData: {
+              ...form,
+              time: fullTime,
+              clinicName,
+              serviceName,
+              amount: 2000,
+            },
+          },
+        ]);
+  };
 
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-slate-50 p-4 md:p-6 font-sans">
-      <div className="max-w-5xl w-full h-[85vh] bg-white rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100 ring-4 ring-white/50 backdrop-blur-xl">
+    <div className="h-screen w-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-slate-50 p-2 font-sans">
+      <div className="max-w-7xl w-full h-[92vh] bg-white rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100 ring-4 ring-white/50 backdrop-blur-xl">
         
         {/* Header */}
-        <div className="bg-white border-b border-slate-100 px-8 py-5 flex items-center justify-between shadow-sm relative z-10">
+        <div className="bg-white border-b border-slate-100 px-8 py-5 flex items-center justify-between shadow-sm relative z-10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-blue-200">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
@@ -439,57 +525,100 @@ export default function ChatClient() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Date Picker Area */}
+        {/* Date & Time Picker Area */}
         {showDatePicker && (
-          <div className="border-t border-slate-100 z-10 px-6 py-4 bg-white/80 backdrop-blur-md animate-in slide-in-from-bottom duration-300 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-             <div className="flex items-center gap-2 mb-3">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                 <label className="text-sm font-bold text-slate-700">Chọn ngày khám mong muốn</label>
+          <div className="border-t border-slate-100 z-10 px-6 py-5 bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.12)] animate-in slide-in-from-bottom duration-300">
+             <div className="flex items-center gap-2 mb-4">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                 <label className="text-base font-bold text-slate-800">Chọn thời gian khám</label>
              </div>
-            <input
-              type="date"
-              className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition cursor-pointer hover:bg-white"
-              min={new Date().toISOString().split("T")[0]}
-              onChange={async (e) => {
-                const date = e.target.value;
-                setTempDay(date);
-                setShowDatePicker(false);
+             
+             {/* Tabs */}
+             <div className="flex gap-3 mb-5 overflow-x-auto pb-2 scrollbar-hide">
+                {[0, 1, 2].map(offset => {
+                    const { dateStr, displayDate, label } = getDayLabel(offset);
+                    const isSelected = tempDay === dateStr;
+                    return (
+                        <button 
+                            key={offset}
+                            onClick={() => setTempDay(dateStr)}
+                            className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] flex-1 ${
+                                isSelected 
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200" 
+                                : "bg-white text-slate-600 border-slate-200 hover:border-indigo-200 hover:bg-slate-50"
+                            }`}
+                        >
+                            <span className="text-lg font-bold">{displayDate}</span>
+                            <span className={`text-xs font-medium ${isSelected ? "text-indigo-100" : "text-slate-400"}`}>{label}</span>
+                        </button>
+                    )
+                })}
+                 <div className="relative flex-1 min-w-[100px]">
+                    <input 
+                        type="date" 
+                        min={todayStr}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full"
+                        onChange={(e) => setTempDay(e.target.value)}
+                    />
+                    <button 
+                        className={`w-full h-full flex flex-col items-center justify-center p-3 rounded-xl border transition ${
+                            ![0, 1, 2].map(o => getDayLabel(o).dateStr).includes(tempDay) && tempDay
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-lg" 
+                            : "bg-white text-slate-600 border-slate-200 hover:border-indigo-200"
+                        }`}
+                    >
+                        {![0, 1, 2].map(o => getDayLabel(o).dateStr).includes(tempDay) && tempDay ? (
+                              <>
+                                <span className="text-lg font-bold">
+                                    {tempDay.split('-').reverse().slice(0,2).join('/')}
+                                </span>
+                                <span className="text-xs font-medium opacity-90">Ngày khác</span>
+                              </>
+                        ) : (
+                             <>
+                                <span className="text-lg font-bold">--/--</span>
+                                <span className="text-xs font-medium text-slate-400">Ngày khác</span>
+                             </>
+                        )}
+                    </button>
+                 </div>
+             </div>
 
-                pushBot(`Ngày khám: ${date}`);
-                pushBot("Đang kiểm tra giờ trống...");
-
-                setSlots([]);
-
-                const res = await fetch(
-                  `/api/available-slots?clinic_id=${form.clinic}&service_id=${form.service}&date=${date}`
-                );
-                const data: SlotStat[] = await res.json();
-
-                if (!data.length) {
-                  pushBot("Ngày này đã kín lịch.");
-                  setShowDatePicker(true);
-                  return;
-                }
-
-                setSlots(data);
-                setStep("time");
-                pushBot("Chọn giờ khám:");
-                pushBot(data.map((s, i) => `${i + 1}. ${s.time}`).join("\n"));
-              }}
-            />
+             {/* Slots Grid */}
+             <div>
+                {slots.length > 0 ? (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                        {slots.map((s, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => handleTimeSelect(s.time)}
+                                className="py-2.5 px-2 bg-white border border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 text-slate-700 rounded-lg text-sm font-semibold transition shadow-sm"
+                            >
+                                {s.time}
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-8 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200 gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span className="text-sm">Không có lịch trống hoặc đang tải...</span>
+                    </div>
+                )}
+             </div>
           </div>
         )}
 
         {/* Input Area */}
-        <div className="p-4 bg-white border-t border-slate-100">
+        <div className="p-4 bg-white border-t border-slate-100 shrink-0">
              <div className="flex gap-2 items-center bg-white p-2 rounded-[2rem] border border-slate-200 shadow-sm focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50 transition-all">
                 <input
-                    className="flex-1 bg-transparent border-none px-5 py-3 focus:ring-0 outline-none text-slate-700 placeholder:text-slate-400 font-medium"
-                    placeholder="Nhập câu trả lời của bạn..."
+                    className="flex-1 bg-transparent border-none px-5 py-3 focus:ring-0 outline-none text-slate-700 placeholder:text-slate-400 font-medium disabled:opacity-50"
+                    placeholder={showDatePicker ? "Vui lòng chọn thời gian ở trên..." : "Nhập câu trả lời của bạn..."}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
                     autoFocus
+                    disabled={showDatePicker} // Disable typing if picking date
                 />
                 <button
                     onClick={handleSend}
