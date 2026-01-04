@@ -70,8 +70,12 @@ export function useBookingForm() {
 
     if (!form.clinic) e.clinic = "Chọn phòng khám";
     if (!form.service) e.service = "Chọn dịch vụ";
-    if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
-    if (!form.appointmentTime) e.appointmentTime = "Chọn giờ";
+
+    // Only validate date/time if clinic and service are selected (since the UI blocks them otherwise)
+    if (form.clinic && form.service) {
+      if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
+      if (!form.appointmentTime) e.appointmentTime = "Chọn giờ";
+    }
     if (!form.consent) e.consent = true;
 
     return e;

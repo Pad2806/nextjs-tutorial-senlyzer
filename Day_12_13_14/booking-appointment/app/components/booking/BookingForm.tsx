@@ -210,136 +210,141 @@ export default function BookingForm() {
           </div>
 
           {/* Right Column: Time Selection */}
-          <div className="space-y-4 relative">
+          <div className="space-y-4">
              <label className="text-sm font-medium block text-slate-900">Thời gian khám *</label>
              
-             {/* Disable Overlay if Clinic/Service not selected */}
-             {(!form.clinic || !form.service) && (
-                <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-xl border border-dashed border-slate-300">
-                    <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded shadow-sm border">
-                        Vui lòng chọn Phòng khám & Chuyên khoa trước
-                    </span>
-                </div>
-             )}
+             <div className="relative rounded-xl">
+                 {/* Disable Overlay if Clinic/Service not selected */}
+                 {(!form.clinic || !form.service) && (
+                    <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-xl border border-dashed border-slate-300">
+                        <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded shadow-sm border">
+                            Vui lòng chọn Phòng khám & Chuyên khoa trước
+                        </span>
+                    </div>
+                 )}
 
-             {/* Custom Date Picker Tabs */}
-             <div className={`flex gap-4 mb-4 overflow-x-auto pb-2 ${(!form.clinic || !form.service) ? 'opacity-50 pointer-events-none' : ''}`}>
-                {[0, 1, 2].map(offset => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + offset);
-                    const dateStr = d.toLocaleDateString("en-CA"); // YYYY-MM-DD
-                    const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}`;
-                    
-                    const weekdays = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-                    const realDayName = weekdays[d.getDay()];
+                 {/* Content Wrapper */}
+                 <div className={`${(!form.clinic || !form.service) ? 'opacity-50 pointer-events-none' : ''} transition-opacity duration-200`}>
+                     {/* Custom Date Picker Tabs */}
+                     <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+                        {[0, 1, 2].map(offset => {
+                            const d = new Date();
+                            d.setDate(d.getDate() + offset);
+                            const dateStr = d.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                            const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}`;
+                            
+                            const weekdays = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+                            const realDayName = weekdays[d.getDay()];
 
-                    const isSelected = selectedTab === offset;
-                    
-                    return (
-                        <button 
-                            key={offset}
-                            onClick={() => {
-                                update("appointmentDate", dateStr);
-                                update("appointmentTime", "");
-                                setTimeSlots([]);
-                            }}
-                            className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] ${
-                                isSelected 
-                                ? "bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105" 
-                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200 hover:bg-white"
-                            }`}
-                        >
-                            <span className="text-lg font-bold">{displayDate}</span>
-                            <span className="text-xs font-medium opacity-90">{realDayName}</span>
-                        </button>
-                    )
-                })}
-                <div className="relative">
-                    <input 
-                        ref={datePickerRef}
-                        type="date" 
-                        min={minDate}
-                        className="sr-only"
-                        onChange={(e) => {
-                             if(e.target.value) {
-                                 update("appointmentDate", e.target.value);
-                                 update("appointmentTime", "");
-                                 setTimeSlots([]);
-                             }
-                        }}
-                    />
-                    <button 
-                        onClick={() => {
-                            if (datePickerRef.current) {
-                                try {
-                                    datePickerRef.current.showPicker();
-                                } catch (e) {
-                                    // Fallback for older browsers
-                                    datePickerRef.current.click();
-                                }
-                            }
-                        }}
-                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
-                        selectedTab === "other"
-                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
-                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
-                    }`}>
-                        {selectedTab === "other" && form.appointmentDate ? (
-                             <>
-                                <span className="text-lg font-bold">
-                                    {form.appointmentDate.split('-').reverse().slice(0,2).join('/')}
-                                </span>
-                                <span className="text-xs font-medium flex items-center gap-1">
-                                    Ngày khác <Calendar className="w-3 h-3" />
-                                </span>
-                             </>
+                            const isSelected = selectedTab === offset;
+                            
+                            return (
+                                <button 
+                                    key={offset}
+                                    onClick={() => {
+                                        update("appointmentDate", dateStr);
+                                        update("appointmentTime", "");
+                                        setTimeSlots([]);
+                                    }}
+                                    className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] ${
+                                        isSelected 
+                                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105" 
+                                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200 hover:bg-white"
+                                    }`}
+                                >
+                                    <span className="text-lg font-bold">{displayDate}</span>
+                                    <span className="text-xs font-medium opacity-90">{realDayName}</span>
+                                </button>
+                            )
+                        })}
+                        <div className="relative">
+                            <input 
+                                ref={datePickerRef}
+                                type="date" 
+                                min={minDate}
+                                className="sr-only"
+                                onChange={(e) => {
+                                     if(e.target.value) {
+                                         update("appointmentDate", e.target.value);
+                                         update("appointmentTime", "");
+                                         setTimeSlots([]);
+                                     }
+                                }}
+                            />
+                            <button 
+                                onClick={() => {
+                                    if (datePickerRef.current) {
+                                        try {
+                                            datePickerRef.current.showPicker();
+                                        } catch (e) {
+                                            // Fallback for older browsers
+                                            datePickerRef.current.click();
+                                        }
+                                    }
+                                }}
+                                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
+                                selectedTab === "other"
+                                ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
+                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
+                            }`}>
+                                {selectedTab === "other" && form.appointmentDate ? (
+                                     <>
+                                        <span className="text-lg font-bold">
+                                            {form.appointmentDate.split('-').reverse().slice(0,2).join('/')}
+                                        </span>
+                                        <span className="text-xs font-medium flex items-center gap-1">
+                                            Ngày khác <Calendar className="w-3 h-3" />
+                                        </span>
+                                     </>
+                                ) : (
+                                     <>
+                                        <span className="text-lg font-bold">--/--</span>
+                                        <span className="text-xs font-medium flex items-center gap-1">
+                                            Ngày khác <Calendar className="w-3 h-3" />
+                                        </span>
+                                     </>
+                                )}
+                                
+                            </button>
+                         </div>
+                     </div>
+
+                     {/* Time Slots Grid */}
+                     <div>
+                        {timeSlots.length > 0 ? (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                {timeSlots.map(s => (
+                                    <button
+                                        key={s.time}
+                                        onClick={() => update("appointmentTime", s.time)}
+                                        className={`py-2 px-1 text-sm rounded border transition ${
+                                            form.appointmentTime === s.time
+                                            ? "bg-blue-100 text-blue-700 border-blue-300 font-semibold"
+                                            : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
+                                        }`}
+                                    >
+                                        {s.time}
+                                    </button>
+                                ))}
+                            </div>
                         ) : (
-                             <>
-                                <span className="text-lg font-bold">--/--</span>
-                                <span className="text-xs font-medium flex items-center gap-1">
-                                    Ngày khác <Calendar className="w-3 h-3" />
-                                </span>
-                             </>
+                            <div className="text-sm text-slate-400 italic bg-slate-50 p-4 rounded-lg text-center border border-dashed border-slate-200">
+                                {form.appointmentDate ? "Đang tải hoặc không có giờ trống..." : "Vui lòng chọn ngày khám"}
+                            </div>
                         )}
-                        
-                    </button>
+                        {errors.appointmentDate && <p className="text-sm text-red-600 mt-1">{errors.appointmentDate}</p>}
+                        {errors.appointmentTime && <p className="text-sm text-red-600 mt-1">{errors.appointmentTime}</p>}
+
+                        {hasCheckedSlots && timeSlots.length === 0 && form.appointmentDate && (
+                            <div className="mt-2 text-sm text-orange-600">Đã hết lịch cho ngày này</div>
+                        )}
+                     </div>
+                     
+                     <p className="text-xs text-slate-500 italic mt-4">
+                        *Lưu ý: Tổng đài viên sẽ gọi lại cho quý khách để xác nhận thông tin thời gian dựa theo đăng ký và điều chỉnh nếu cần thiết.
+                     </p>
                  </div>
              </div>
-
-             {/* Time Slots Grid */}
-             <div>
-                {timeSlots.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                        {timeSlots.map(s => (
-                            <button
-                                key={s.time}
-                                onClick={() => update("appointmentTime", s.time)}
-                                className={`py-2 px-1 text-sm rounded border transition ${
-                                    form.appointmentTime === s.time
-                                    ? "bg-blue-100 text-blue-700 border-blue-300 font-semibold"
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
-                                }`}
-                            >
-                                {s.time}
-                            </button>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-sm text-slate-400 italic bg-slate-50 p-4 rounded-lg text-center border border-dashed border-slate-200">
-                        {form.appointmentDate ? "Đang tải hoặc không có giờ trống..." : "Vui lòng chọn ngày khám"}
-                    </div>
-                )}
-                {errors.appointmentDate && <p className="text-sm text-red-600 mt-1">{errors.appointmentDate}</p>}
-                {errors.appointmentTime && <p className="text-sm text-red-600 mt-1">{errors.appointmentTime}</p>}
-
-                {hasCheckedSlots && timeSlots.length === 0 && form.appointmentDate && (
-                    <div className="mt-2 text-sm text-orange-600">Đã hết lịch cho ngày này</div>
-                )}
-             </div>
-             
-             <p className="text-xs text-slate-500 italic mt-4">
-                *Lưu ý: Tổng đài viên sẽ gọi lại cho quý khách để xác nhận thông tin thời gian dựa theo đăng ký và điều chỉnh nếu cần thiết.
-             </p>
           </div>
         </div>
       </div>
