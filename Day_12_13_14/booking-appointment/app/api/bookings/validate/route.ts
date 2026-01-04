@@ -21,9 +21,9 @@ export async function POST(req: Request) {
         .eq("patient_phone", phone)
         .gte("booking_time", `${datePart}T00:00:00`)
         .lte("booking_time", `${datePart}T23:59:59`)
-        .neq("status", "completed")
-        .neq("status", "cancelled")
-        .neq("status", "failed")
+        // Chỉ chặn nếu đã thanh toán (active). Pending/Expired cho phép đặt lại.
+        .eq("status", "paid")
+        .eq("status", "pending")
         .maybeSingle();
 
     if (existingBooking) {
