@@ -333,10 +333,12 @@ export default function ChatClient() {
     setInput("");
   };
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -468,7 +470,7 @@ export default function ChatClient() {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-slate-50 scroll-smooth">
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-8 bg-slate-50 scroll-smooth">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -576,7 +578,6 @@ export default function ChatClient() {
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Date & Time Picker Area */}
