@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
@@ -9,8 +10,14 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="text-xl font-semibold text-blue-600">
-          Health<span className="text-slate-800">Booking</span>
+        <Link href="/" className="relative h-12 w-48">
+             <Image 
+                src="/logo-thiennhan-horizontal.png" 
+                alt="Thien Nhan Hospital" 
+                fill
+                className="object-contain object-left"
+                priority
+             />
         </Link>
 
         <div className="flex items-center gap-6">

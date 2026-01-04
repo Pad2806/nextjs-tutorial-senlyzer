@@ -10,6 +10,14 @@ const beVietnam = Be_Vietnam_Pro({
   variable: "--font-be-vietnam",
 });
 
+export const metadata = {
+  title: "Thiện Nhân Hospital - Đặt lịch khám",
+  description: "Hệ thống đặt lịch khám bệnh trực tuyến - Bệnh viện Thiện Nhân",
+  icons: {
+    icon: "/logo-thiennhan-square.png",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
