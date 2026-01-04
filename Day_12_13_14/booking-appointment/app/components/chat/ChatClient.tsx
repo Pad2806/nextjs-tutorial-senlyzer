@@ -65,6 +65,7 @@ export default function ChatClient() {
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDay, setTempDay] = useState("");
+  const datePickerRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<BookingFormState>({
     name: "",
@@ -89,7 +90,9 @@ export default function ChatClient() {
           pushBot("Thanh toán thành công! Lịch hẹn của bạn đã được xác nhận.");
         } else if (data.status === "expired") {
           setPaymentBookingId(null);
-          pushBot("Giao dịch đã hết hạn.");
+          pushBot("Giao dịch đã hết hạn. Vui lòng chọn lại thời gian khám.");
+          setStep("date");
+          setShowDatePicker(true);
         }
       } catch (error) {
         console.error("Payment check error:", error);
@@ -606,12 +609,22 @@ export default function ChatClient() {
                 })}
                  <div className="relative flex-1 min-w-[100px]">
                     <input 
+                        ref={datePickerRef}
                         type="date" 
                         min={todayStr}
-                        className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full"
+                        className="sr-only"
                         onChange={(e) => setTempDay(e.target.value)}
                     />
                     <button 
+                        onClick={() => {
+                            if (datePickerRef.current) {
+                                try {
+                                    datePickerRef.current.showPicker();
+                                } catch (e) {
+                                    datePickerRef.current.click();
+                                }
+                            }
+                        }}
                         className={`w-full h-full flex flex-col items-center justify-center p-3 rounded-xl border transition ${
                             ![0, 1, 2].map(o => getDayLabel(o).dateStr).includes(tempDay) && tempDay
                             ? "bg-indigo-600 text-white border-indigo-600 shadow-lg" 
