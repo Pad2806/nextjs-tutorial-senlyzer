@@ -146,14 +146,12 @@ export default function ChatClient() {
 
       case "age":
         setStep("clinic");
-        pushBot("Bạn muốn đặt lịch tại phòng khám nào?");
-        pushBot(clinics.map((c, i) => `${i + 1}. ${c.name}`).join("\n"));
+        pushBot("Bạn muốn đặt lịch tại phòng khám nào?\n" + clinics.map((c, i) => `${i + 1}. ${c.name}`).join("\n"));
         break;
 
       case "clinic":
         setStep("service");
-        pushBot("Bạn muốn sử dụng dịch vụ nào?");
-        pushBot(services.map((s, i) => `${i + 1}. ${s.name}`).join("\n"));
+        pushBot("Bạn muốn sử dụng dịch vụ nào?\n" + services.map((s, i) => `${i + 1}. ${s.name}`).join("\n"));
         break;
 
       case "service":
@@ -445,7 +443,7 @@ export default function ChatClient() {
 
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-slate-50 p-2 font-sans">
+    <div className="h-[calc(100vh-5rem)] w-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-slate-50 p-2 font-sans">
       <div className="max-w-7xl w-full h-full bg-white rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100 ring-4 ring-white/50 backdrop-blur-xl">
         
         {/* Header */}
@@ -695,7 +693,7 @@ export default function ChatClient() {
                 </button>
              </div>
              <p className="text-center text-[10px] text-slate-400 mt-3 font-medium uppercase tracking-wide opacity-70">
-                Được hỗ trợ bởi AI • Thông tin của bạn được bảo mật
+                Trợ lý tư vấn tự động • Thông tin của bạn được bảo mật
              </p>
         </div>
       </div>
