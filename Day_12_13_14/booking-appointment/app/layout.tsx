@@ -2,8 +2,6 @@ import "./globals.css";
 import { Be_Vietnam_Pro } from "next/font/google";
 import AuthProvider from "@/app/provider/SessionProvider";
 
-
-
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
