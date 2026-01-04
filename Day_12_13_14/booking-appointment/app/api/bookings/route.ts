@@ -21,7 +21,9 @@ export async function POST(req: Request) {
     .eq("patient_phone", body.phone)
     .gte("booking_time", `${datePart}T00:00:00`)
     .lte("booking_time", `${datePart}T23:59:59`)
-    .eq("status", "paid")
+    .neq("status", "completed")
+    .neq("status", "cancelled")
+    .neq("status", "failed") // Added failed just in case
     .maybeSingle();
 
   if (existingBooking) {

@@ -47,7 +47,7 @@ export function useBookingForm() {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
-  function validateForm(): boolean {
+  function getValidationErrors(): Partial<BookingFormState> {
     const e: Partial<BookingFormState> = {};
 
     if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
@@ -72,63 +72,61 @@ export function useBookingForm() {
     if (!form.service) e.service = "Chọn dịch vụ";
     if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
     if (!form.appointmentTime) e.appointmentTime = "Chọn giờ";
-    if (!form.consent) e.consent = true; // Error marker, message can be handled in UI or here. TypeScript boolean or string?
-    // The errors state is Partial<BookingFormState>, so e.consent must be boolean if the interface says so.
-    // Wait, usually errors object stores string messages. 
-    // Let's modify BookingFormState for errors? No, errors is Partial<BookingFormState> implies same types.
-    // If I want a string message for consent error, I should probably define consent error as string in a separate Error interface or just use boolean and show generic message.
-    // However, existing errors use string. e.g. e.name = "..."
-    // If I add consent?: boolean to BookingFormState, then e.consent must be boolean.
-    // This is a limitation of the current design if I want "Vui lòng..." string.
-    // Let's assume I can change the interface or I just use a string for the error type?
-    // Actually, `setErrors` uses `Partial<BookingFormState>`.
-    // If I change `consent` in `BookingFormState` to be `boolean`, then `errors.consent` is boolean.
-    // If I want a message, I might need to cast or change how errors are typed.
-    // BUT, easiest way: Add `consent` as boolean to State, but for validation...
-    // Let's look at `errors` usage. `errors.name` is used as text.
-    // If `errors.consent` is strictly boolean `true`, I can conditional render the text in UI.
-    // "Vui lòng đồng ý..."
-
-    // So:
     if (!form.consent) e.consent = true;
 
+    return e;
+  }
+
+  function validateForm(): boolean {
+    const e = getValidationErrors();
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
   async function validateBookingAvailability(): Promise<boolean> {
-    if (!validateForm()) return false;
+    // 1. Get local validation errors
+    const e = getValidationErrors();
+    const isLocalValid = Object.keys(e).length === 0;
 
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/bookings/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: form.phone,
-          appointmentDate: form.appointmentDate,
-        }),
-      });
+    // 2. Check if we should call the server to check duplications
+    // We proceed if phone format is valid, even if other fields have errors
+    const isPhoneValidFormat = !(e as any).phone;
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        if (res.status === 400 && errorData.error) {
-          setErrors((prev) => ({ ...prev, phone: errorData.error }));
-          setTimeout(() => {
-            setErrors((prev) => ({ ...prev, phone: undefined }));
-          }, 5000);
-          return false;
+    if (isPhoneValidFormat && form.appointmentDate) {
+      setIsSubmitting(true);
+      try {
+        const res = await fetch("/api/bookings/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: form.phone,
+            appointmentDate: form.appointmentDate,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          if (res.status === 400 && errorData.error) {
+            e.phone = errorData.error;
+          } else {
+            throw new Error(errorData.error || "Validation failed");
+          }
         }
-        throw new Error(errorData.error || "Validation failed");
+      } catch (err: any) {
+        console.error(err);
+        // Don't alert here to avoid spamming if user just has missing name
+        // But if it's a real network error, maybe? 
+        // For now, implicit fail or just log.
+      } finally {
+        setIsSubmitting(false);
       }
-      return true;
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Có lỗi xảy ra khi kiểm tra");
-      return false;
-    } finally {
-      setIsSubmitting(false);
     }
+
+    // 3. Set all errors (local + server)
+    setErrors(e);
+
+    // 4. Return true only if NO errors at all
+    return Object.keys(e).length === 0;
   }
 
   async function submit() {
