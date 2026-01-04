@@ -14,6 +14,7 @@ import {
   FileText,
   X,
   CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { generateSepayQR } from "@/app/lib/payment/sepayqr";
 
@@ -76,10 +77,10 @@ export default function BookingForm() {
   const datePickerRef = useRef<HTMLInputElement>(null);
   
   const [paymentBookingId, setPaymentBookingId] = useState<string | null>(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid" | "expired">("pending");
 
   useEffect(() => {
-    if (!paymentBookingId || paymentSuccess) return;
+    if (!paymentBookingId || paymentStatus === "paid" || paymentStatus === "expired") return;
 
     const interval = setInterval(async () => {
       try {
@@ -87,15 +88,11 @@ export default function BookingForm() {
         const data = await res.json();
 
         if (data.status === "paid") {
-          setPaymentSuccess(true);
+          setPaymentStatus("paid");
           clearInterval(interval);
         } else if (data.status === "expired") {
-          setPaymentBookingId(null);
-          alert("Giao dịch đã hết hạn");
-          reset();
-          setShowModal(false);
-          setHasCheckedSlots(false);
-          setTimeSlots([]);
+          setPaymentStatus("expired");
+          clearInterval(interval);
         }
       } catch (e) {
         console.error(e);
@@ -103,7 +100,7 @@ export default function BookingForm() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [paymentBookingId, paymentSuccess, reset]);
+  }, [paymentBookingId, paymentStatus]);
 
   useEffect(() => {
     Promise.all([
@@ -532,7 +529,7 @@ export default function BookingForm() {
                    if (bookingId) {
                        setShowModal(false);
                        setPaymentBookingId(bookingId);
-                       setPaymentSuccess(false);
+                       setPaymentStatus("pending");
                    }
                 }}
                 disabled={isSubmitting}
@@ -549,7 +546,7 @@ export default function BookingForm() {
       {paymentBookingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
            <div className="bg-white rounded-[2rem] p-6 shadow-2xl max-w-sm w-full relative animate-in zoom-in-95 duration-200 border border-slate-100">
-               {!paymentSuccess ? (
+               {paymentStatus === "pending" && (
                    /* Pending State */
                    <>
                         <button 
@@ -601,7 +598,9 @@ export default function BookingForm() {
                             </div>
                         </div>
                    </>
-               ) : (
+               )}
+
+               {paymentStatus === "paid" && (
                    /* Success State */
                    <div className="text-center space-y-6 pt-4">
                         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-2 animate-in zoom-in duration-300">
@@ -627,7 +626,7 @@ export default function BookingForm() {
                         <button
                             onClick={() => {
                                 setPaymentBookingId(null);
-                                setPaymentSuccess(false);
+                                setPaymentStatus("pending");
                                 reset();
                                 setHasCheckedSlots(false);
                                 setTimeSlots([]);
@@ -635,6 +634,44 @@ export default function BookingForm() {
                             className="w-full py-3.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200"
                         >
                             Hoàn tất
+                        </button>
+                   </div>
+               )}
+
+               {paymentStatus === "expired" && (
+                   /* Expired State */
+                   <div className="text-center space-y-6 pt-4">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 text-red-600 mb-2 animate-in zoom-in duration-300">
+                             <AlertCircle size={48} strokeWidth={3} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold text-slate-900">Hết thời gian thanh toán</h3>
+                            <p className="text-slate-500">Vui lòng thực hiện lại quy trình đặt lịch</p>
+                        </div>
+                        
+                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 text-sm space-y-2">
+                             <div className="flex justify-between">
+                                <span className="text-slate-500">Mã đặt lịch</span>
+                                <span className="font-bold text-slate-900">#{paymentBookingId?.slice(0, 8)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Trạng thái</span>
+                                <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded">Đã hết hạn</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                setPaymentBookingId(null);
+                                setPaymentStatus("pending");
+                                reset();
+                                setHasCheckedSlots(false);
+                                setTimeSlots([]);
+                            }}
+                            className="w-full py-3.5 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-900 transition shadow-lg"
+                        >
+                            Đóng & Tạo lại
                         </button>
                    </div>
                )}
