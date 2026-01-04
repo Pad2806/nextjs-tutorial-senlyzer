@@ -399,11 +399,22 @@ export default function BookingForm() {
              />
         </div>
         
-        <div className="mt-4 flex items-start gap-2">
-            <input type="checkbox" id="consent" className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-            <label htmlFor="consent" className="text-xs text-slate-600 leading-relaxed">
-                Tôi đã đọc và đồng ý với <a href="#" className="text-blue-600 hover:underline">Chính sách bảo vệ dữ liệu cá nhân</a> và chấp thuận để xử lý dữ liệu cá nhân...
-            </label>
+        <div className="mt-4">
+            <div className="flex items-start gap-2">
+                <input 
+                    type="checkbox" 
+                    id="consent" 
+                    className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={form.consent || false}
+                    onChange={(e) => update("consent", e.target.checked)}
+                />
+                <label htmlFor="consent" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+                    Tôi đã đọc và đồng ý với <a href="#" className="text-blue-600 hover:underline">Chính sách bảo vệ dữ liệu cá nhân</a> và chấp thuận để xử lý dữ liệu cá nhân...
+                </label>
+            </div>
+            {errors.consent && (
+                <p className="text-sm text-red-600 mt-1 pl-6">Vui lòng đồng ý với điều khoản để tiếp tục</p>
+            )}
         </div>
       </div>
 
@@ -442,8 +453,8 @@ export default function BookingForm() {
                   <span className="font-medium">{form.phone}</span>
                 </div>
                  <div className="flex justify-between">
-                  <span className="text-blue-600">Ngày sinh:</span>
-                  <span className="font-medium">{form.dob ? form.dob : "—"}</span>
+                  <span className="text-blue-600">Tuổi:</span>
+                  <span className="font-medium">{form.age ? form.age : "—"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-600">Phòng khám:</span>
@@ -519,7 +530,17 @@ function Input({
           value={value ?? ""}
           min={min}
           placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            // If label implies phone number, restricted to digits only
+            if (label.toLowerCase().includes("điện thoại") || label.toLowerCase().includes("phone")) {
+                if (/^\d*$/.test(val)) {
+                    onChange(val);
+                }
+            } else {
+                onChange(val);
+            }
+          }}
           className={`w-full py-3 rounded-xl border ${
             icon ? "pl-10" : "pl-4"
           } ${error ? "border-red-500 hover:border-red-500" : "border-slate-300 hover:border-blue-400"} transition focus:ring-2 focus:ring-blue-100 outline-none`}

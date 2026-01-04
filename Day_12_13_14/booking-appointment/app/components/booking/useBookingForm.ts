@@ -15,6 +15,7 @@ export interface BookingFormState {
   appointmentTime?: string;
   email?: string;
   dob?: string;
+  consent?: boolean;
 }
 
 export function useBookingForm() {
@@ -32,6 +33,7 @@ export function useBookingForm() {
     appointmentTime: "",
     email: "",
     dob: "",
+    consent: false,
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormState>>({});
@@ -70,6 +72,25 @@ export function useBookingForm() {
     if (!form.service) e.service = "Chọn dịch vụ";
     if (!form.appointmentDate) e.appointmentDate = "Chọn ngày";
     if (!form.appointmentTime) e.appointmentTime = "Chọn giờ";
+    if (!form.consent) e.consent = true; // Error marker, message can be handled in UI or here. TypeScript boolean or string?
+    // The errors state is Partial<BookingFormState>, so e.consent must be boolean if the interface says so.
+    // Wait, usually errors object stores string messages. 
+    // Let's modify BookingFormState for errors? No, errors is Partial<BookingFormState> implies same types.
+    // If I want a string message for consent error, I should probably define consent error as string in a separate Error interface or just use boolean and show generic message.
+    // However, existing errors use string. e.g. e.name = "..."
+    // If I add consent?: boolean to BookingFormState, then e.consent must be boolean.
+    // This is a limitation of the current design if I want "Vui lòng..." string.
+    // Let's assume I can change the interface or I just use a string for the error type?
+    // Actually, `setErrors` uses `Partial<BookingFormState>`.
+    // If I change `consent` in `BookingFormState` to be `boolean`, then `errors.consent` is boolean.
+    // If I want a message, I might need to cast or change how errors are typed.
+    // BUT, easiest way: Add `consent` as boolean to State, but for validation...
+    // Let's look at `errors` usage. `errors.name` is used as text.
+    // If `errors.consent` is strictly boolean `true`, I can conditional render the text in UI.
+    // "Vui lòng đồng ý..."
+
+    // So:
+    if (!form.consent) e.consent = true;
 
     setErrors(e);
     return Object.keys(e).length === 0;
