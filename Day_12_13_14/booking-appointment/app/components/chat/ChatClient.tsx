@@ -136,8 +136,7 @@ export default function ChatClient() {
 
       case "symptoms":
         setStep("gender");
-        pushBot("Giới tính của bạn?");
-        pushBot("1. Nam\n2. Nữ");
+        pushBot("Giới tính của bạn?\n1. Nam\n2. Nữ");
         break;
 
       case "gender":
@@ -160,7 +159,6 @@ export default function ChatClient() {
       case "service":
         setStep("date");
         setShowDatePicker(true);
-        // pushBot("Vui lòng chọn ngày khám:"); // Removed text prompt as UI appears
         break;
 
       default:
@@ -374,6 +372,11 @@ export default function ChatClient() {
                      s = s.filter(slot => slot.time > currentTime);
                  }
                  setSlots(s);
+
+                 if (s.length === 0) {
+                    const dateDisplay = tempDay.split('-').reverse().join('/');
+                    pushBot(`Ngày ${dateDisplay} không còn lịch trống. Quý khách vui lòng chọn ngày khác.`);
+                 }
             })
             .catch(err => console.error(err));
     }
@@ -443,11 +446,11 @@ export default function ChatClient() {
 
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-slate-50 p-2 font-sans">
-      <div className="max-w-7xl w-full h-[92vh] bg-white rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100 ring-4 ring-white/50 backdrop-blur-xl">
+    <div className="h-screen w-full flex items-center justify-center bg-white font-sans">
+      <div className="w-full h-full bg-white flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="bg-white border-b border-slate-100 px-8 py-5 flex items-center justify-between shadow-sm relative z-10 shrink-0">
+        <div className="bg-white border-b border-slate-100 px-8 py-4 flex items-center justify-between shadow-sm relative z-10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-blue-200">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
