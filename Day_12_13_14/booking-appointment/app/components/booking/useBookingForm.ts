@@ -14,7 +14,6 @@ export interface BookingFormState {
   appointmentDate?: string;
   appointmentTime?: string;
   email?: string;
-  doctor?: string;
   dob?: string;
 }
 
@@ -32,7 +31,6 @@ export function useBookingForm() {
     appointmentDate: "",
     appointmentTime: "",
     email: "",
-    doctor: "",
     dob: "",
   });
 

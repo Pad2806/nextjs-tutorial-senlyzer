@@ -65,7 +65,6 @@ export default function BookingForm() {
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [doctors, setDoctors] = useState<Option[]>([]); // New state for doctors
   const [hasCheckedSlots, setHasCheckedSlots] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -84,32 +83,6 @@ export default function BookingForm() {
       setLoading(false);
     });
   }, []);
-
-  // UseEffect to fetch doctors
-  useEffect(() => {
-    if (!form.clinic || !form.service) {
-        setDoctors([]);
-        return;
-    }
-    fetch(`/api/doctors?clinic_id=${form.clinic}&service_id=${form.service}`)
-        .then((r) => r.json())
-        .then((data) => {
-            if (Array.isArray(data)) {
-                // Map to ensure name property exists (handle name vs full_name)
-                const mappedDoctors = data.map((d: any) => ({
-                    id: d.id,
-                    name: d.name || d.full_name || d.fullName || "Bác sĩ",
-                }));
-                setDoctors(mappedDoctors);
-            } else {
-                setDoctors([]);
-            }
-        })
-        .catch(err => {
-            console.error("Failed to load doctors", err);
-            setDoctors([]);
-        });
-  }, [form.clinic, form.service]);
 
   useEffect(() => {
     if (!form.clinic || !form.service || !form.appointmentDate) {
@@ -203,17 +176,6 @@ export default function BookingForm() {
                 update("appointmentTime", "");
                 setTimeSlots([]);
               }}
-            />
-
-            <Select
-                label="Bác sĩ"
-                value={form.doctor} 
-                options={[
-                    {id: "", name: "Chọn Bác sĩ muốn khám"},
-                    ...doctors
-                ]} 
-                onChange={(v) => update("doctor", v)}
-                disabled={doctors.length === 0}
             />
 
           </div>
