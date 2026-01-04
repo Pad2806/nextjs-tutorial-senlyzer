@@ -489,6 +489,10 @@ export default function ChatClient() {
                                             <span className="font-semibold text-slate-900 text-right">{m.bookingData.name}</span>
                                         </div>
                                         <div className="flex justify-between items-baseline border-b border-slate-100 pb-2">
+                                            <span className="text-slate-500">Tuổi</span>
+                                            <span className="font-semibold text-slate-900 text-right">{m.bookingData.age}</span>
+                                        </div>
+                                        <div className="flex justify-between items-baseline border-b border-slate-100 pb-2">
                                             <span className="text-slate-500">Số điện thoại</span>
                                             <span className="font-semibold text-slate-900 text-right">{m.bookingData.phone}</span>
                                         </div>
@@ -503,7 +507,10 @@ export default function ChatClient() {
                                         <div className="flex justify-between items-center bg-blue-50/50 p-2 rounded-lg border border-blue-100">
                                             <span className="text-slate-500">Thời gian</span>
                                             <span className="text-blue-700 font-bold">
-                                                {new Date(m.bookingData.time).toLocaleString("vi-VN", {dateStyle: 'short', timeStyle: 'short'})}
+                                                {(() => {
+                                                    const d = new Date(m.bookingData.time);
+                                                    return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')} - ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                                                })()}
                                             </span>
                                         </div>
                                     </div>
