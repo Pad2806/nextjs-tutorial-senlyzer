@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     .eq("patient_phone", body.phone)
     .gte("booking_time", `${datePart}T00:00:00`)
     .lte("booking_time", `${datePart}T23:59:59`)
-    .eq("status", "paid") // Only block if already paid
+    .in("status", ["paid", "pending"])
     .maybeSingle();
 
   if (existingBooking) {

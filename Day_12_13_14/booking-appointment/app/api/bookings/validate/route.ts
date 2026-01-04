@@ -21,8 +21,8 @@ export async function POST(req: Request) {
         .eq("patient_phone", phone)
         .gte("booking_time", `${datePart}T00:00:00`)
         .lte("booking_time", `${datePart}T23:59:59`)
-        // Chỉ chặn nếu đã thanh toán (active). Pending/Expired cho phép đặt lại.
-        .eq("status", "paid")
+        // Chặn nếu đã thanh toán hoặc đang chờ thanh toán (paid/pending).
+        .in("status", ["paid", "pending"])
         .maybeSingle();
 
     if (existingBooking) {
