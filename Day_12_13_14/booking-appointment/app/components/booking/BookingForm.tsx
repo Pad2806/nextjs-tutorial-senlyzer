@@ -13,7 +13,9 @@ import {
   Calendar,
   FileText,
   X,
+  CheckCircle2,
 } from "lucide-react";
+import { generateSepayQR } from "@/app/lib/payment/sepayqr";
 
 interface Option {
   id: string;
@@ -61,7 +63,7 @@ type BookingResponse = {
 };
 
 export default function BookingForm() {
-  const { form, update, submit, errors, isSubmitting, validateBookingAvailability } = useBookingForm();
+  const { form, update, submit, errors, isSubmitting, validateBookingAvailability, reset } = useBookingForm();
   const [clinics, setClinics] = useState<Option[]>([]);
   const [services, setServices] = useState<Option[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -72,6 +74,36 @@ export default function BookingForm() {
   today.setHours(0, 0, 0, 0);
   const minDate = today.toLocaleDateString("en-CA");
   const datePickerRef = useRef<HTMLInputElement>(null);
+  
+  const [paymentBookingId, setPaymentBookingId] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!paymentBookingId || paymentSuccess) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/bookings/${paymentBookingId}`);
+        const data = await res.json();
+
+        if (data.status === "paid") {
+          setPaymentSuccess(true);
+          clearInterval(interval);
+        } else if (data.status === "expired") {
+          setPaymentBookingId(null);
+          alert("Giao dịch đã hết hạn");
+          reset();
+          setShowModal(false);
+          setHasCheckedSlots(false);
+          setTimeSlots([]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [paymentBookingId, paymentSuccess, reset]);
 
   useEffect(() => {
     Promise.all([
@@ -495,7 +527,14 @@ export default function BookingForm() {
                 Hủy
               </button>
               <button
-                onClick={submit}
+                onClick={async () => {
+                   const bookingId = await submit();
+                   if (bookingId) {
+                       setShowModal(false);
+                       setPaymentBookingId(bookingId);
+                       setPaymentSuccess(false);
+                   }
+                }}
                 disabled={isSubmitting}
                 className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:bg-slate-400 transition"
               >
@@ -503,6 +542,103 @@ export default function BookingForm() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Payment QR Modal */}
+      {paymentBookingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+           <div className="bg-white rounded-[2rem] p-6 shadow-2xl max-w-sm w-full relative animate-in zoom-in-95 duration-200 border border-slate-100">
+               {!paymentSuccess ? (
+                   /* Pending State */
+                   <>
+                        <button 
+                            onClick={() => setPaymentBookingId(null)}
+                            className="absolute right-4 top-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition"
+                        >
+                            <X size={20} />
+                        </button>
+                        
+                        <div className="text-center space-y-4 pt-2">
+                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600 mb-2">
+                                <FileText />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-800">Thanh toán giữ lịch</h3>
+                            <p className="text-slate-500 text-sm px-4">
+                                Quét mã QR để hoàn tất đặt lịch
+                            </p>
+
+                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block">
+                                <img 
+                                    src={generateSepayQR({
+                                        bankCode: "TPB",
+                                        accountNo: "23238628888",
+                                        amount: 2000,
+                                        description: `DATLICH_${paymentBookingId}`,
+                                    })} 
+                                    alt="QR Code" 
+                                    className="w-48 h-48 sm:w-56 sm:h-56 object-contain mix-blend-multiply"
+                                />
+                            </div>
+
+                            <div className="space-y-2 text-sm bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">Số tiền:</span>
+                                    <span className="font-bold text-blue-600 text-lg">2.000 đ</span>
+                                </div>
+                                <div className="flex justify-between items-baseline text-left">
+                                    <span className="text-slate-500 shrink-0 mr-2">Nội dung:</span>
+                                    <span className="font-mono font-bold text-slate-700 break-all">DATLICH_{paymentBookingId}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-center gap-2 text-xs font-medium text-emerald-600 bg-emerald-50 py-2 rounded-lg">
+                                <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                Đang chờ thanh toán...
+                            </div>
+                        </div>
+                   </>
+               ) : (
+                   /* Success State */
+                   <div className="text-center space-y-6 pt-4">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-2 animate-in zoom-in duration-300">
+                             <CheckCircle2 size={48} strokeWidth={3} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold text-slate-900">Thanh toán thành công!</h3>
+                            <p className="text-slate-500">Lịch khám của bạn đã được xác nhận</p>
+                        </div>
+
+                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 text-sm space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Mã đặt lịch</span>
+                                <span className="font-bold text-slate-900">#{paymentBookingId?.slice(0, 8)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">Trạng thái</span>
+                                <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded">Đã thanh toán</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                setPaymentBookingId(null);
+                                setPaymentSuccess(false);
+                                reset();
+                                setHasCheckedSlots(false);
+                                setTimeSlots([]);
+                            }}
+                            className="w-full py-3.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200"
+                        >
+                            Hoàn tất
+                        </button>
+                   </div>
+               )}
+           </div>
         </div>
       )}
     </div>

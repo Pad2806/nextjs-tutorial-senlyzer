@@ -172,13 +172,31 @@ export function useBookingForm() {
       }
 
       const data: { bookingId: string } = await res.json();
-      router.push(`/payment?bookingId=${data.bookingId}`);
+      return data.bookingId;
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Có lỗi xảy ra");
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function reset() {
+    setForm({
+      name: "",
+      phone: "",
+      gender: "",
+      age: "",
+      symptoms: "",
+      clinic: "",
+      service: "",
+      appointmentDate: "",
+      appointmentTime: "",
+      email: "",
+      dob: "",
+      consent: false,
+    });
+    setErrors({});
   }
 
   return {
@@ -189,5 +207,6 @@ export function useBookingForm() {
     isSubmitting,
     validateForm,
     validateBookingAvailability,
+    reset,
   };
 }
