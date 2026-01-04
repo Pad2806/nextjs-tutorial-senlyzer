@@ -310,7 +310,7 @@ export default function ChatClient() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
-      <div className="max-w-4xl w-full h-[85vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+      <div className="max-w-6xl w-full h-[85vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-5 flex items-center gap-4 shadow-md">
