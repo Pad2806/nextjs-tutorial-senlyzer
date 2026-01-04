@@ -23,6 +23,7 @@ export async function POST(req: Request) {
         .lte("booking_time", `${datePart}T23:59:59`)
         // Chỉ chặn nếu đã thanh toán (active). Pending/Expired cho phép đặt lại.
         .eq("status", "paid")
+        .eq("status", "pending")
         .maybeSingle();
 
     if (existingBooking) {
