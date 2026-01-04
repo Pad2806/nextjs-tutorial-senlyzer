@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Thiện Nhân Hospital - Đặt lịch khám bệnh",
   description: "Hệ thống đặt lịch khám bệnh trực tuyến tại Thiện Nhân Hospital",
   icons: {
-    icon: "/logo.png",
+    icon: "/favicon.png",
   },
 };
 

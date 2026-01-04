@@ -132,7 +132,7 @@ export default function BookingForm() {
   if (loading) {
     return (
       <div className="p-16 flex justify-center">
-        <Loader2 className="animate-spin w-6 h-6 text-blue-600" />
+        <Loader2 className="animate-spin w-6 h-6 text-amber-500" />
       </div>
     );
   }
@@ -216,8 +216,8 @@ export default function BookingForm() {
                             }}
                             className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] ${
                                 isSelected 
-                                ? "bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105" 
-                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200 hover:bg-white"
+                                ? "bg-amber-500 text-white border-amber-500 shadow-md transform scale-105" 
+                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-amber-200 hover:bg-white"
                             }`}
                         >
                             <span className="text-lg font-bold">{displayDate}</span>
@@ -225,7 +225,7 @@ export default function BookingForm() {
                         </button>
                     )
                 })}
-                <div className="relative">
+                <div className="relative group">
                     <input 
                         ref={datePickerRef}
                         type="date" 
@@ -250,10 +250,10 @@ export default function BookingForm() {
                                 }
                             }
                         }}
-                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full relative z-10 ${
                         selectedTab === "other"
-                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
-                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
+                        ? "bg-amber-500 text-white border-amber-500 shadow-md" 
+                        : "bg-gray-50 text-slate-600 border-slate-100 group-hover:border-amber-200"
                     }`}>
                         {selectedTab === "other" && form.appointmentDate ? (
                              <>
@@ -287,8 +287,8 @@ export default function BookingForm() {
                                 onClick={() => update("appointmentTime", s.time)}
                                 className={`py-2 px-1 text-sm rounded border transition ${
                                     form.appointmentTime === s.time
-                                    ? "bg-blue-100 text-blue-700 border-blue-300 font-semibold"
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
+                                    ? "bg-amber-100 text-amber-900 border-amber-300 font-semibold"
+                                    : "bg-white text-slate-600 border-slate-200 hover:border-amber-300"
                                 }`}
                             >
                                 {s.time}
@@ -332,7 +332,7 @@ export default function BookingForm() {
                            placeholder="Họ và tên"
                            value={form.name}
                            onChange={(e) => update("name", e.target.value)}
-                           className={`w-full py-3 px-4 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-100 outline-none`}
+                           className={`w-full py-3 px-4 rounded-xl border ${errors.name ? 'border-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-amber-200 outline-none`}
                         />
                         {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
                     </div>
@@ -347,7 +347,7 @@ export default function BookingForm() {
                                     value="male"
                                     checked={form.gender === "male"} 
                                     onChange={() => update("gender", "male")}
-                                    className="w-4 h-4 text-blue-600"
+                                    className="w-4 h-4 text-amber-600 focus:ring-amber-500"
                                 />
                                 <span className="text-sm">Nam</span>
                              </label>
@@ -358,7 +358,7 @@ export default function BookingForm() {
                                     value="female"
                                     checked={form.gender === "female"} 
                                     onChange={() => update("gender", "female")}
-                                    className="w-4 h-4 text-pink-500"
+                                    className="w-4 h-4 text-amber-600 focus:ring-amber-500"
                                 />
                                 <span className="text-sm">Nữ</span>
                              </label>
@@ -404,7 +404,7 @@ export default function BookingForm() {
                 <input 
                     type="checkbox" 
                     id="consent" 
-                    className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                     checked={form.consent || false}
                     onChange={(e) => update("consent", e.target.checked)}
                 />
@@ -425,7 +425,7 @@ export default function BookingForm() {
             if (isValid) setShowModal(true);
             }}
             disabled={isSubmitting}
-            className="px-8 py-3 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl disabled:bg-slate-400 min-w-[200px]"
+            className="px-8 py-3 rounded-full bg-amber-500 text-white font-bold text-lg hover:bg-amber-600 transition shadow-lg hover:shadow-xl disabled:bg-slate-400 min-w-[200px]"
         >
             {isSubmitting ? "Đang xử lý..." : "Xác nhận"}
         </button>
@@ -443,33 +443,33 @@ export default function BookingForm() {
             </div>
 
             <div className="space-y-4 text-sm">
-              <div className="bg-blue-50 p-4 rounded-xl space-y-2 text-blue-900">
+              <div className="bg-amber-50 p-4 rounded-xl space-y-2 text-amber-900 border border-amber-100">
                 <div className="flex justify-between">
-                  <span className="text-blue-600">Bệnh nhân:</span>
+                  <span className="text-amber-800 font-semibold">Bệnh nhân:</span>
                   <span className="font-medium">{form.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-blue-600">SĐT:</span>
+                  <span className="text-amber-800 font-semibold">SĐT:</span>
                   <span className="font-medium">{form.phone}</span>
                 </div>
                  <div className="flex justify-between">
-                  <span className="text-blue-600">Tuổi:</span>
+                  <span className="text-amber-800 font-semibold">Tuổi:</span>
                   <span className="font-medium">{form.age ? form.age : "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-blue-600">Phòng khám:</span>
+                  <span className="text-amber-800 font-semibold">Phòng khám:</span>
                   <span className="font-medium">
                     {clinics.find((c) => c.id === form.clinic)?.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-blue-600">Dịch vụ:</span>
+                  <span className="text-amber-800 font-semibold">Dịch vụ:</span>
                   <span className="font-medium">
                     {services.find((s) => s.id === form.service)?.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-blue-600">Thời gian:</span>
+                  <span className="text-amber-800 font-semibold">Thời gian:</span>
                   <span className="font-medium">
                     {form.appointmentTime} -{" "}
                     {form.appointmentDate?.split("-").reverse().join("/")}
@@ -477,11 +477,11 @@ export default function BookingForm() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-blue-200 rounded-xl bg-white shadow-sm">
+              <div className="flex items-center justify-between p-4 border border-amber-200 rounded-xl bg-white shadow-sm">
                 <span className="text-slate-600 font-medium">
                   Tiền đặt cọc
                 </span>
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-lg font-bold text-amber-600">
                   2.000 đ
                 </span>
               </div>
@@ -497,7 +497,7 @@ export default function BookingForm() {
               <button
                 onClick={submit}
                 disabled={isSubmitting}
-                className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:bg-slate-400 transition"
+                className="flex-1 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 disabled:bg-slate-400 transition"
               >
                 {isSubmitting ? "Đang xử lý..." : "Thanh toán"}
               </button>
@@ -543,7 +543,7 @@ function Input({
           }}
           className={`w-full py-3 rounded-xl border ${
             icon ? "pl-10" : "pl-4"
-          } ${error ? "border-red-500 hover:border-red-500" : "border-slate-300 hover:border-blue-400"} transition focus:ring-2 focus:ring-blue-100 outline-none`}
+          } ${error ? "border-red-500 hover:border-red-500" : "border-slate-300 hover:border-amber-400"} transition focus:ring-2 focus:ring-amber-200 outline-none`}
         />
       </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
@@ -564,7 +564,7 @@ function Select({
     <div>
       <label className="text-sm font-medium">{label}</label>
       <div className="relative mt-1">
-        {icon && <span className="absolute left-3 top-3">{icon}</span>}
+        {icon && <span className="absolute left-3 top-3 text-slate-400">{icon}</span>}
         <select
           value={value ?? ""}
           disabled={disabled}
@@ -573,7 +573,7 @@ function Select({
             icon ? "pl-10" : "pl-4"
           } ${
             error ? "border-red-500" : "border-slate-300"
-          } disabled:bg-slate-100`}
+          } disabled:bg-slate-100 hover:border-amber-400 focus:ring-2 focus:ring-amber-200 outline-none transition`}
         >
           <option value="">Chọn</option>
           {options.map((o) => (
@@ -605,17 +605,18 @@ function TextArea({
     <div>
       <label className="text-sm font-medium">{label}</label>
       <div className="relative mt-1">
-        {icon && <span className="absolute left-3 top-3">{icon}</span>}
+        {icon && <span className="absolute left-3 top-3 text-slate-400">{icon}</span>}
         <textarea
           rows={3}
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
           className={`w-full py-3 rounded-xl border ${
             icon ? "pl-10" : "pl-4"
-          } ${error ? "border-red-500" : "border-slate-300"}`}
+          } ${error ? "border-red-500" : "border-slate-300 hover:border-amber-400"} transition focus:ring-2 focus:ring-amber-200 outline-none`}
         />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }
+
