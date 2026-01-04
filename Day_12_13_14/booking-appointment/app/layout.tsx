@@ -1,15 +1,8 @@
 import "./globals.css";
 import { Be_Vietnam_Pro } from "next/font/google";
 import AuthProvider from "@/app/provider/SessionProvider";
-import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Thiện Nhân Hospital",
-  description: "Đặt lịch khám bệnh trực tuyến",
-  icons: {
-    icon: "/favicon-new.png",
-  },
-};
+
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin"],

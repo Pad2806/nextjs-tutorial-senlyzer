@@ -16,7 +16,7 @@ export default function BookingsPage() {
   }
   if (!isAuthenticated) return null;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#003B73]/5 to-slate-100 px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-8">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900">
@@ -28,7 +28,7 @@ export default function BookingsPage() {
         </div>
 
         <div className="relative">
-          <div className="absolute inset-0 -z-10 bg-[#003B73]/10 blur-3xl rounded-3xl" />
+          <div className="absolute inset-0 -z-10 bg-blue-200/30 blur-3xl rounded-3xl" />
           <BookingForm />
         </div>
       </div>

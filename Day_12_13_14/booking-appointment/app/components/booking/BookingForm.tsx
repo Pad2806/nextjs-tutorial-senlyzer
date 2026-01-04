@@ -216,8 +216,8 @@ export default function BookingForm() {
                             }}
                             className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] ${
                                 isSelected 
-                                ? "bg-[#003B73] text-white border-[#003B73] shadow-md transform scale-105" 
-                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-[#003B73]/50 hover:bg-white"
+                                ? "bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105" 
+                                : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200 hover:bg-white"
                             }`}
                         >
                             <span className="text-lg font-bold">{displayDate}</span>
@@ -252,8 +252,8 @@ export default function BookingForm() {
                         }}
                         className={`flex flex-col items-center justify-center p-3 rounded-xl border transition min-w-[100px] h-full ${
                         selectedTab === "other"
-                        ? "bg-[#003B73] text-white border-[#003B73] shadow-md" 
-                        : "bg-gray-50 text-slate-600 border-slate-100 group-hover:border-[#003B73]/50"
+                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md" 
+                        : "bg-gray-50 text-slate-600 border-slate-100 hover:border-emerald-200"
                     }`}>
                         {selectedTab === "other" && form.appointmentDate ? (
                              <>
@@ -287,8 +287,8 @@ export default function BookingForm() {
                                 onClick={() => update("appointmentTime", s.time)}
                                 className={`py-2 px-1 text-sm rounded border transition ${
                                     form.appointmentTime === s.time
-                                    ? "bg-[#003B73]/10 text-[#003B73] border-[#003B73] font-semibold"
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-[#003B73]/50"
+                                    ? "bg-blue-100 text-blue-700 border-blue-300 font-semibold"
+                                    : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
                                 }`}
                             >
                                 {s.time}
@@ -409,7 +409,7 @@ export default function BookingForm() {
                     onChange={(e) => update("consent", e.target.checked)}
                 />
                 <label htmlFor="consent" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
-                    Tôi đã đọc và đồng ý với <a href="#" className="text-[#003B73] hover:underline">Chính sách bảo vệ dữ liệu cá nhân</a> và chấp thuận để xử lý dữ liệu cá nhân...
+                    Tôi đã đọc và đồng ý với <a href="#" className="text-blue-600 hover:underline">Chính sách bảo vệ dữ liệu cá nhân</a> và chấp thuận để xử lý dữ liệu cá nhân...
                 </label>
             </div>
             {errors.consent && (
@@ -425,7 +425,7 @@ export default function BookingForm() {
             if (isValid) setShowModal(true);
             }}
             disabled={isSubmitting}
-            className="px-8 py-3 rounded-full bg-[#003B73] text-white font-bold text-lg hover:bg-[#002a5c] transition shadow-lg hover:shadow-xl disabled:bg-slate-400 min-w-[200px]"
+            className="px-8 py-3 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl disabled:bg-slate-400 min-w-[200px]"
         >
             {isSubmitting ? "Đang xử lý..." : "Xác nhận"}
         </button>
@@ -543,7 +543,7 @@ function Input({
           }}
           className={`w-full py-3 rounded-xl border ${
             icon ? "pl-10" : "pl-4"
-          } ${error ? "border-red-500 hover:border-red-500" : "border-slate-300 hover:border-[#003B73]"} transition focus:ring-2 focus:ring-[#003B73]/20 outline-none`}
+          } ${error ? "border-red-500 hover:border-red-500" : "border-slate-300 hover:border-blue-400"} transition focus:ring-2 focus:ring-blue-100 outline-none`}
         />
       </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
