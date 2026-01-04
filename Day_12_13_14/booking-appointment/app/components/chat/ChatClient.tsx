@@ -309,155 +309,128 @@ export default function ChatClient() {
 
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-2xl w-full h-[700px] bg-white rounded-3xl shadow flex flex-col">
-        <div className="bg-blue-600 text-white px-6 py-4 rounded-t-3xl">
-          <h2 className="text-lg font-semibold">Chat đặt lịch khám</h2>
+    <div className="h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
+      <div className="max-w-4xl w-full h-[85vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+        
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-5 flex items-center gap-4 shadow-md">
+            <div className="bg-white/20 p-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>
+            </div>
+          <div>
+              <h2 className="text-xl font-bold">Trợ lý ảo đặt lịch</h2>
+              <p className="text-xs text-blue-100 opacity-90">Luôn sẵn sàng hỗ trợ 24/7</p>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 scroll-smooth">
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`flex ${
+              className={`flex w-full ${
                 m.from === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <div
-                className={`px-4 py-2 rounded-xl text-sm max-w-[80%] break-words
-                ${
-                  m.from === "user"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-slate-800"
-                }`}
-              >
-                {/* {m.type === "confirmation" && m.bookingData ? (
-                  <div className="space-y-3 min-w-[250px]">
-                    <p className="font-semibold text-base border-b border-blue-200 pb-2 mb-2">
-                      Thông tin đặt lịch
-                    </p>
-                    <div className="space-y-1 text-sm">
-                      <p>
-                        <span className="font-medium">Bệnh nhân:</span>{" "}
-                        {m.bookingData.name}
-                      </p>
-                      <p>
-                        <span className="font-medium">SĐT:</span>{" "}
-                        {m.bookingData.phone}
-                      </p>
-                      <p>
-                        <span className="font-medium">Phòng khám:</span>{" "}
-                        {m.bookingData.clinicName}
-                      </p>
-                      <p>
-                        <span className="font-medium">Dịch vụ:</span>{" "}
-                        {m.bookingData.serviceName}
-                      </p>
-                      <p>
-                        <span className="font-medium">Thời gian:</span>{" "}
-                        {new Date(m.bookingData.time).toLocaleString("vi-VN")}
-                      </p>
-                      <p className="text-blue-700 font-bold pt-2 border-t border-slate-200 mt-2">
-                        Tiền cọc: {m.bookingData.amount.toLocaleString()} đ
-                      </p>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        const loadingMsgId = Date.now();
-                        pushBot("Đang xử lý...");
-                        const bookingId = await createBookingViaApi(
-                          m.bookingData!.time
-                        );
-                        if (bookingId) {
-                          pushBot("Đặt lịch thành công!");
-                          router.push(`/payment?bookingId=${bookingId}`);
-                        } else {
-                          pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
-                        }
-                      }}
-                      className="w-full py-2 bg-white text-blue-600 font-bold rounded-lg border border-blue-200 hover:bg-blue-50 transition"
-                    >
-                      Thanh toán
-                    </button>
+              <div className={`flex max-w-[85%] ${m.from === "user" ? "flex-row-reverse" : "flex-row"} gap-3`}>
+                  
+                  {/* Avatar */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${m.from === "user" ? "bg-blue-100" : "bg-emerald-100"}`}>
+                        {m.from === "user" ? (
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        ) : (
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                        )}
                   </div>
-                ) : (
-                  <div className="whitespace-pre-line">{m.text}</div>
-                )} */}
-                {m.type === "confirmation" && m.bookingData ? (
-  <div className="w-[300px] rounded-xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
-    {/* Header */}
-    <div className="font-semibold text-slate-800 text-sm border-b pb-2">
-      Thông tin đặt lịch
-    </div>
 
-    {/* Info */}
-    <div className="grid grid-cols-3 gap-y-1.5 text-sm">
-      <span className="text-slate-500">Bệnh nhân</span>
-      <span className="col-span-2 font-medium text-slate-800">
-        {m.bookingData.name}
-      </span>
+                  {/* Bubble */}
+                  <div
+                    className={`px-5 py-3.5 rounded-2xl text-base shadow-sm leading-relaxed
+                    ${
+                      m.from === "user"
+                        ? "bg-blue-600 text-white rounded-tr-none"
+                        : "bg-white text-slate-700 border border-slate-100 rounded-tl-none"
+                    }`}
+                  >
+                        {m.type === "confirmation" && m.bookingData ? (
+                        <div className="w-[320px] bg-white rounded-xl p-1">
+                             <div className="bg-slate-50 rounded-lg p-4 space-y-4 border border-slate-100">
+                                {/* Header */}
+                                <div className="border-b border-slate-200 pb-3 mb-1">
+                                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.78 4.78 4 4 0 0 1-6.74 0 4 4 0 0 1-4.78-4.78 2 2 0 0 1 0-2.83Z"/><path d="m9 12 2 2 4-4"/></svg>
+                                        Xác nhận thông tin
+                                    </h3>
+                                </div>
 
-      <span className="text-slate-500">SĐT</span>
-      <span className="col-span-2 font-medium text-slate-800">
-        {m.bookingData.phone}
-      </span>
+                                {/* Info Grid */}
+                                <div className="space-y-3 text-sm">
+                                    <div className="grid grid-cols-[100px_1fr] gap-2">
+                                        <span className="text-slate-500">Bệnh nhân</span>
+                                        <span className="font-semibold text-slate-900">{m.bookingData.name}</span>
+                                    </div>
+                                    <div className="grid grid-cols-[100px_1fr] gap-2">
+                                        <span className="text-slate-500">Số điện thoại</span>
+                                        <span className="font-semibold text-slate-900">{m.bookingData.phone}</span>
+                                    </div>
+                                    <div className="grid grid-cols-[100px_1fr] gap-2">
+                                        <span className="text-slate-500">Phòng khám</span>
+                                        <span className="font-semibold text-slate-900">{m.bookingData.clinicName}</span>
+                                    </div>
+                                    <div className="grid grid-cols-[100px_1fr] gap-2">
+                                        <span className="text-slate-500">Dịch vụ</span>
+                                        <span className="font-semibold text-slate-900">{m.bookingData.serviceName}</span>
+                                    </div>
+                                    <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                                        <span className="text-slate-500">Thời gian</span>
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 w-fit">
+                                            {new Date(m.bookingData.time).toLocaleString("vi-VN", {dateStyle: 'short', timeStyle: 'short'})}
+                                        </span>
+                                    </div>
+                                </div>
 
-      <span className="text-slate-500">Phòng khám</span>
-      <span className="col-span-2 font-medium text-slate-800">
-        {m.bookingData.clinicName}
-      </span>
+                                {/* Total */}
+                                <div className="flex justify-between items-center pt-3 border-t border-dashed border-slate-300">
+                                    <span className="text-slate-600 font-medium">Tiền cọc</span>
+                                    <span className="text-lg font-bold text-blue-600">{m.bookingData.amount.toLocaleString()} đ</span>
+                                </div>
+                            </div>
 
-      <span className="text-slate-500">Dịch vụ</span>
-      <span className="col-span-2 font-medium text-slate-800">
-        {m.bookingData.serviceName}
-      </span>
-
-      <span className="text-slate-500">Thời gian</span>
-      <span className="col-span-2 font-semibold text-blue-600">
-        {new Date(m.bookingData.time).toLocaleString("vi-VN")}
-      </span>
-    </div>
-
-    {/* Amount */}
-    <div className="flex justify-between items-center rounded-lg bg-blue-50 px-3 py-2">
-      <span className="text-sm text-slate-600">Tiền cọc</span>
-      <span className="font-bold text-blue-700">
-        {m.bookingData.amount.toLocaleString()} đ
-      </span>
-    </div>
-
-    {/* Button */}
-    <button
-      onClick={async () => {
-        pushBot("Đang xử lý...");
-        const bookingId = await createBookingViaApi(m.bookingData!.time);
-        if (bookingId) {
-          pushBot("Đặt lịch thành công!");
-          router.push(`/payment?bookingId=${bookingId}`);
-        } else {
-          pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
-        }
-      }}
-      className="w-full rounded-lg bg-blue-600 py-2 text-white text-sm font-semibold hover:bg-blue-700 transition"
-    >
-      Thanh toán
-    </button>
-  </div>
-) : (
-  <div className="whitespace-pre-line">{m.text}</div>
-)}
-
+                            {/* Action Button */}
+                            <button
+                            onClick={async () => {
+                                pushBot("Đang xử lý...");
+                                const bookingId = await createBookingViaApi(m.bookingData!.time);
+                                if (bookingId) {
+                                pushBot("Đặt lịch thành công!");
+                                router.push(`/payment?bookingId=${bookingId}`);
+                                } else {
+                                pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
+                                }
+                            }}
+                            className="mt-3 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                <span>Thanh toán ngay</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        ) : (
+                        <div className="whitespace-pre-line">{m.text}</div>
+                        )}
+                  </div>
               </div>
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Date Picker Area */}
         {showDatePicker && (
-          <div className="border-t px-4 py-3 bg-gray-50">
+          <div className="border-t border-slate-100 px-6 py-4 bg-white animate-in slide-in-from-bottom duration-300">
+             <label className="text-xs font-bold text-slate-400 uppercase mb-2 block tracking-wider">Chọn ngày khám</label>
             <input
               type="date"
-              className="w-full border rounded-xl px-4 py-2"
+              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition"
               min={new Date().toISOString().split("T")[0]}
               onChange={async (e) => {
                 const date = e.target.value;
@@ -489,20 +462,28 @@ export default function ChatClient() {
           </div>
         )}
 
-        <div className="border-t p-4 flex gap-2">
-          <input
-            className="flex-1 border rounded-xl px-4 py-2"
-            placeholder="Nhập tin nhắn..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          />
-          <button
-            onClick={handleSend}
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl"
-          >
-            Gửi
-          </button>
+        {/* Input Area */}
+        <div className="p-4 bg-white border-t border-slate-100">
+             <div className="flex gap-3 items-center bg-slate-50 p-2 pr-2 rounded-[1.5rem] border border-slate-200 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-50 transition-all shadow-sm">
+                <input
+                    className="flex-1 bg-transparent border-none px-4 py-3 focus:ring-0 outline-none text-slate-700 placeholder:text-slate-400"
+                    placeholder="Nhập tin nhắn..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    autoFocus
+                />
+                <button
+                    onClick={handleSend}
+                    disabled={!input.trim()}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white p-3 rounded-full transition-all shadow-md hover:shadow-lg active:scale-90 flex-shrink-0"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+             </div>
+             <p className="text-center text-xs text-slate-400 mt-2">
+                Bot có thể chưa hoàn thiện, vui lòng kiểm tra kỹ thông tin.
+             </p>
         </div>
       </div>
     </div>
