@@ -5,6 +5,7 @@ import { supabase } from "@/app/lib/supabase/client";
 import { Clinic } from "@/app/lib/supabase/types/clinic";
 import { Service } from "@/app/lib/supabase/types/service";
 import { useRouter } from "next/navigation";
+import { generateSepayQR } from "@/app/lib/payment/sepayqr";
 
 type SlotStat = {
   time: string;
@@ -72,6 +73,31 @@ export default function ChatClient() {
     symptoms: "",
     gender: true,
   });
+
+  const [paymentBookingId, setPaymentBookingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!paymentBookingId) return;
+
+    const timer = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/bookings/${paymentBookingId}`);
+        const data = await res.json();
+
+        if (data.status === "paid") {
+          setPaymentBookingId(null);
+          pushBot("Thanh toán thành công! Lịch hẹn của bạn đã được xác nhận.");
+        } else if (data.status === "expired") {
+          setPaymentBookingId(null);
+          pushBot("Giao dịch đã hết hạn.");
+        }
+      } catch (error) {
+        console.error("Payment check error:", error);
+      }
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [paymentBookingId]);
 
 
   const pushBot = (text: string) =>
@@ -528,10 +554,9 @@ export default function ChatClient() {
                                     pushBot("Đang xử lý...");
                                     const bookingId = await createBookingViaApi(m.bookingData!.time);
                                     if (bookingId) {
-                                    pushBot("Đặt lịch thành công!");
-                                    router.push(`/payment?bookingId=${bookingId}`);
+                                        setPaymentBookingId(bookingId);
                                     } else {
-                                    pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
+                                        pushBot("Đặt lịch thất bại. Vui lòng thử lại.");
                                     }
                                 }}
                                 className="mt-4 w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
@@ -659,6 +684,63 @@ export default function ChatClient() {
              </p>
         </div>
       </div>
+
+      {/* Payment QR Modal */}
+      {paymentBookingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-[2rem] p-6 shadow-2xl max-w-sm w-full relative animate-in zoom-in-95 duration-200 border border-slate-100">
+                <button 
+                    onClick={() => setPaymentBookingId(null)}
+                    className="absolute right-4 top-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>
+                </button>
+
+                <div className="text-center space-y-4 pt-2">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-slate-800">Thanh toán giữ lịch</h3>
+                    <p className="text-slate-500 text-sm px-4">
+                        Vui lòng quét mã QR bên dưới để hoàn tất đặt lịch
+                    </p>
+
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block">
+                        <img 
+                            src={generateSepayQR({
+                                bankCode: "TPB",
+                                accountNo: "23238628888",
+                                amount: 2000,
+                                description: `DATLICH_${paymentBookingId}`,
+                            })} 
+                            alt="QR Code" 
+                            className="w-48 h-48 sm:w-56 sm:h-56 object-contain mix-blend-multiply"
+                        />
+                    </div>
+
+                    <div className="space-y-2 text-sm bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                        <div className="flex justify-between">
+                            <span className="text-slate-500">Số tiền:</span>
+                            <span className="font-bold text-blue-600 text-lg">2.000 đ</span>
+                        </div>
+                        <div className="flex justify-between items-baseline text-left">
+                            <span className="text-slate-500 shrink-0 mr-2">Nội dung:</span>
+                            <span className="font-mono font-bold text-slate-700 break-all">DATLICH_{paymentBookingId}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 text-xs font-medium text-emerald-600 bg-emerald-50 py-2 rounded-lg">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Đang chờ thanh toán...
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
