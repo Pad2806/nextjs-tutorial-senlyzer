@@ -606,6 +606,8 @@ export default function BookingForm() {
                                 </span>
                                 Đang chờ thanh toán...
                             </div>
+
+                            {paymentCreatedAt && <PaymentCountdown createdAt={paymentCreatedAt} />}
                         </div>
                    </>
                )}
