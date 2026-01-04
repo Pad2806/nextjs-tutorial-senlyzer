@@ -76,6 +76,7 @@ export default function ChatClient() {
   });
 
   const [paymentBookingId, setPaymentBookingId] = useState<string | null>(null);
+  const [paymentCreatedAt, setPaymentCreatedAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!paymentBookingId) return;
@@ -84,12 +85,17 @@ export default function ChatClient() {
       try {
         const res = await fetch(`/api/bookings/${paymentBookingId}`);
         const data = await res.json();
+        
+        if (data.created_at && !paymentCreatedAt) {
+            setPaymentCreatedAt(data.created_at);
+        }
 
         if (data.status === "paid") {
           setPaymentBookingId(null);
           pushBot("Thanh toán thành công! Lịch hẹn của bạn đã được xác nhận.");
         } else if (data.status === "expired") {
           setPaymentBookingId(null);
+          setPaymentCreatedAt(null);
           pushBot("Giao dịch đã hết hạn. Vui lòng chọn lại thời gian khám.");
           setStep("date");
           setShowDatePicker(true);
@@ -751,10 +757,38 @@ export default function ChatClient() {
                         </span>
                         Đang chờ thanh toán...
                     </div>
+                     {paymentCreatedAt && <PaymentCountdown createdAt={paymentCreatedAt} />}
                 </div>
             </div>
         </div>
       )}
     </div>
   );
+}
+
+function PaymentCountdown({ createdAt }: { createdAt: string }) {
+  const [timeLeft, setTimeLeft] = useState("");
+  
+  useEffect(() => {
+    const calc = () => {
+        const timeStr = createdAt.endsWith("Z") ? createdAt : createdAt + "Z";
+        const start = new Date(timeStr).getTime();
+        const expire = start + 5 * 60 * 1000;
+        const now = Date.now();
+        const diff = Math.max(0, expire - now);
+        
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        
+        setTimeLeft(`${m}:${s.toString().padStart(2, '0')}`);
+    };
+    calc();
+
+    const timer = setInterval(calc, 1000);
+    return () => clearInterval(timer);
+  }, [createdAt]);
+
+  if (!timeLeft) return null;
+  
+  return <div className="text-center mt-2 animate-in fade-in slide-in-from-top-1"><span className="text-sm font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full border border-orange-100 shadow-sm">Thanh toán trong: {timeLeft}</span></div>;
 }
