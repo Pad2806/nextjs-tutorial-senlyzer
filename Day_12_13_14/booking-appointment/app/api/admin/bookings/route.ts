@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
     .from("admin_booking_overview")
     .select("*", { count: "exact" })
     .order("booking_time", { ascending: false })
+    .order("created_at", { ascending: false })
     .range(from, to);
 
   if (clinicId) query = query.eq("clinic_id", clinicId);
