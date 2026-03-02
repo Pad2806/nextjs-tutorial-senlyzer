@@ -462,7 +462,7 @@ export default function ChatClient() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
             </div>
             <div>
-                <h2 className="text-lg font-bold text-slate-800">Trợ lý ảo Thiện Nhân</h2>
+                <h2 className="text-lg font-bold text-slate-800">Trợ lý ảo Bệnh viện 199</h2>
                 <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <p className="text-xs text-slate-500 font-medium">Đang hoạt động</p>

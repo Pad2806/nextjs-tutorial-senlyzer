@@ -13,7 +13,7 @@ export default function Header() {
         <Link href="/" className="relative h-12 w-48">
              <Image 
                 src="/logo-199.png" 
-                alt="Thien Nhan Hospital" 
+                alt="Bệnh viện 199" 
                 fill
                 className="object-contain object-left"
                 priority
