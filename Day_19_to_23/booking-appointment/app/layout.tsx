@@ -9,10 +9,10 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata = {
-  title: "Thiện Nhân Hospital - Đặt lịch khám",
-  description: "Hệ thống đặt lịch khám bệnh trực tuyến - Bệnh viện Thiện Nhân",
+  title: "Bệnh viện 199 - Đặt lịch khám",
+  description: "Hệ thống đặt lịch khám bệnh trực tuyến - Bệnh viện 199",
   icons: {
-    icon: "/logo-thiennhan-square.png",
+    icon: "/favicon.ico",
   },
 };
 

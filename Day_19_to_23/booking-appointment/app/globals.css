@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-blue-50: var(--color-teal-50);
+  --color-blue-100: var(--color-teal-100);
+  --color-blue-200: var(--color-teal-200);
+  --color-blue-300: var(--color-teal-300);
+  --color-blue-400: var(--color-teal-400);
+  --color-blue-500: #10b981; /* adjusted closer to brand teal */
+  --color-blue-600: #00A896; /* brand primary */
+  --color-blue-700: #008f80;
+  --color-blue-800: #007367;
+  --color-blue-900: var(--color-teal-900);
+  --color-blue-950: var(--color-teal-950);
+}
+
 body {
   font-family: var(--font-be-vietnam), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
