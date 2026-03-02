@@ -406,7 +406,15 @@ export default function BookingForm() {
                            {timeSlots.map(s => (
                                <button
                                    key={s.time}
-                                   onClick={() => update("appointmentTime", s.time)}
+                                   onClick={() => {
+                                       update("appointmentTime", s.time);
+                                       setTimeout(() => {
+                                           if (canGoToStep2 && form.appointmentDate) {
+                                              setDirection('forward');
+                                              setCurrentStep(3);
+                                           }
+                                       }, 300);
+                                   }}
                                    className={`py-3 px-2 text-base font-bold rounded-xl border-2 transition-all ${
                                        form.appointmentTime === s.time
                                        ? "bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20 ring-offset-2"
