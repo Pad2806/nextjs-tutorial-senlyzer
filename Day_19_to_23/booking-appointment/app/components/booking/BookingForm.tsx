@@ -230,7 +230,7 @@ export default function BookingForm() {
       {/* Forms Container with simple fade transition simulation */}
       <div className="relative min-h-[450px]">
         {/* STEP 1: Dịch vụ & Phòng khám */}
-        <div className={`transition-all duration-500 ease-in-out absolute inset-0 ${currentStep === 1 ? 'opacity-100 translate-x-0 z-10' : direction === 'forward' ? '-translate-x-full opacity-0 z-0' : 'translate-x-full opacity-0 z-0'}`}>
+        <div className={`transition-all duration-500 ease-in-out w-full ${currentStep === 1 ? 'relative opacity-100 translate-x-0 z-10' : direction === 'forward' ? 'absolute top-0 left-0 -translate-x-full opacity-0 z-0' : 'absolute top-0 left-0 translate-x-full opacity-0 z-0'}`}>
            <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
               <span className="bg-teal-100 text-teal-700 w-8 h-8 rounded-full flex items-center justify-center text-lg">1</span>
               Chọn Dịch Vụ Khám
@@ -317,7 +317,7 @@ export default function BookingForm() {
         </div>
 
         {/* STEP 2: Thời gian */}
-        <div className={`transition-all duration-500 ease-in-out absolute inset-0 ${currentStep === 2 ? 'opacity-100 translate-x-0 z-10' : direction === 'forward' ? 'translate-x-full opacity-0 z-0' : '-translate-x-full opacity-0 z-0'}`}>
+        <div className={`transition-all duration-500 ease-in-out w-full ${currentStep === 2 ? 'relative opacity-100 translate-x-0 z-10' : direction === 'forward' ? 'absolute top-0 left-0 translate-x-full opacity-0 z-0' : 'absolute top-0 left-0 -translate-x-full opacity-0 z-0'}`}>
            <div className="flex items-center gap-4 mb-6">
                <button onClick={handlePrevStep} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition"><ArrowLeft size={24} /></button>
                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -461,7 +461,7 @@ export default function BookingForm() {
         </div>
 
         {/* STEP 3: Thông tin cá nhân */}
-        <div className={`transition-all duration-500 ease-in-out absolute inset-0 ${currentStep === 3 ? 'opacity-100 translate-x-0 z-10' : direction === 'forward' ? 'translate-x-[200%] opacity-0 z-0' : '-translate-x-full opacity-0 z-0'}`}>
+        <div className={`transition-all duration-500 ease-in-out w-full ${currentStep === 3 ? 'relative opacity-100 translate-x-0 z-10' : direction === 'forward' ? 'absolute top-0 left-0 translate-x-[200%] opacity-0 z-0' : 'absolute top-0 left-0 -translate-x-full opacity-0 z-0'}`}>
            <div className="flex items-center gap-4 mb-6">
                <button onClick={handlePrevStep} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition"><ArrowLeft size={24} /></button>
                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
