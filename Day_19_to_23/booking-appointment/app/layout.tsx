@@ -12,7 +12,7 @@ export const metadata = {
   title: "Bệnh viện 199 - Đặt lịch khám",
   description: "Hệ thống đặt lịch khám bệnh trực tuyến - Bệnh viện 199",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
 };
 
