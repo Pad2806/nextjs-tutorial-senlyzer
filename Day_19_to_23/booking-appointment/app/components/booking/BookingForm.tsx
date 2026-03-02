@@ -74,7 +74,6 @@ export default function BookingForm() {
   // Step Validation
   const canGoToStep2 = !!form.clinic && !!form.service;
   const canGoToStep3 = canGoToStep2 && !!form.appointmentDate && !!form.appointmentTime;
-  const canSubmit = canGoToStep3 && !!form.name && !!form.phone && !!form.age && !!form.gender && !!form.consent;
 
   // Initial Data Fetch
   useEffect(() => {
@@ -568,7 +567,7 @@ export default function BookingForm() {
                      const isValid = await validateBookingAvailability();
                      if (isValid) setShowModal(true);
                   }}
-                  disabled={!canSubmit || isSubmitting}
+                  disabled={isSubmitting}
                   className="w-full sm:w-auto flex justify-center items-center gap-2 px-10 py-4 rounded-full bg-teal-600 text-white font-bold text-lg hover:bg-teal-700 disabled:bg-slate-300 disabled:text-slate-500 transition-all shadow-lg hover:shadow-teal-500/30 active:scale-95"
                >
                   {isSubmitting ? <Loader2 className="animate-spin" /> : "Xác nhận Đặt lịch"}
