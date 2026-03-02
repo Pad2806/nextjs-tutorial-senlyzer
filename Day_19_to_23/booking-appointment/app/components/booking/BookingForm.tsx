@@ -279,7 +279,14 @@ export default function BookingForm() {
                      {services.map(s => (
                          <button
                             key={s.id}
-                            onClick={() => update("service", s.id)}
+                            onClick={() => {
+                                update("service", s.id);
+                                // Auto advance to step 2 after a short delay for better UX
+                                setTimeout(() => {
+                                    setDirection('forward');
+                                    setCurrentStep(2);
+                                }, 300);
+                            }}
                             className={`p-4 rounded-xl border-2 text-left transition-all flex items-center gap-3 ${
                                 form.service === s.id 
                                 ? "border-teal-500 bg-teal-50 text-teal-800 font-bold shadow-sm" 
